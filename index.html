@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZenvioGQ - Gestión de Agentes IA</title>
+    
+    <!-- Fuentes e Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS (Browser) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1a1a2e; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2d2d50; }
+
+        /* Glassmorphism & Utilities */
+        .glass { background: rgba(17, 17, 24, 0.7); backdrop-filter: blur(10px); border: 1px solid #1a1a2e; }
+        .glass-card { background: #0a0a0f; border: 1px solid #1a1a2e; border-radius: 14px; transition: all 0.2s ease; }
+        .glass-card:hover { transform: translateY(-2px); border-color: #2d2d50; box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.1); }
+        
+        /* Agent Colors System */
+        .col-orange-icon { background: linear-gradient(135deg, #f97316, #ea580c); -webkit-background-clip: text; color: transparent; }
+        .col-orange-bar { border-bottom: 3px solid #f97316; }
+        .col-orange-tag { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+        .col-orange-bg { background: linear-gradient(135deg, #f97316, #ea580c); }
+
+        .col-purple-icon { background: linear-gradient(135deg, #8b5cf6, #6d28d9); -webkit-background-clip: text; color: transparent; }
+        .col-purple-bar { border-bottom: 3px solid #8b5cf6; }
+        .col-purple-tag { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+        .col-purple-bg { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+
+        .col-blue-icon { background: linear-gradient(135deg, #3b82f6, #1d4ed8); -webkit-background-clip: text; color: transparent; }
+        .col-blue-bar { border-bottom: 3px solid #3b82f6; }
+        .col-blue-tag { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .col-blue-bg { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+
+        .col-green-icon { background: linear-gradient(135deg, #22c55e, #15803d); -webkit-background-clip: text; color: transparent; }
+        .col-green-bar { border-bottom: 3px solid #22c55e; }
+        .col-green-tag { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+        .col-green-bg { background: linear-gradient(135deg, #22c55e, #15803d); }
+
+        .col-pink-icon { background: linear-gradient(135deg, #ec4899, #be185d); -webkit-background-clip: text; color: transparent; }
+        .col-pink-bar { border-bottom: 3px solid #ec4899; }
+        .col-pink-tag { background: rgba(236, 72, 153, 0.1); color: #ec4899; }
+        .col-pink-bg { background: linear-gradient(135deg, #ec4899, #be185d); }
+
+        .col-yellow-icon { background: linear-gradient(135deg, #eab308, #a16207); -webkit-background-clip: text; color: transparent; }
+        .col-yellow-bar { border-bottom: 3px solid #eab308; }
+        .col-yellow-tag { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+        .col-yellow-bg { background: linear-gradient(135deg, #eab308, #a16207); }
+
+        /* System Tags */
+        .tag-tube { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .tag-shorts { background: rgba(6, 182, 212, 0.1); color: #06b6d4; }
+        .tag-ambos { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+
+        /* Animations */
+        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
+        .dot-active { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; }
+        .dot-paused { width: 8px; height: 8px; background-color: #6b7280; border-radius: 50%; }
+
+        @keyframes typing { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+        .typing-dot { width: 4px; height: 4px; background: #a78bfa; border-radius: 50%; display: inline-block; animation: typing 1s infinite; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        .section-hidden { display: none !important; }
+        
+        /* Drag & Drop */
+        .kanban-col { min-height: 200px; }
+        .kanban-col.drag-over { background: rgba(255, 255, 255, 0.05); border-radius: 14px; }
+        
+        .toast { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateY(100%); opacity: 0; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden text-sm">
+
+    <!-- Mobile Overlay -->
+    <div id="mobileOverlay" class="fixed inset-0 bg-black/80 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-[240px] bg-[#060609] border-r border-[#1a1a2e] flex flex-col fixed inset-y-0 left-0 z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300">
+        <!-- Logo -->
+        <div class="h-16 flex items-center px-6 border-b border-[#1a1a2e]">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center font-bold text-lg shadow-lg shadow-purple-500/20 mr-3">Z</div>
+            <span class="font-bold text-lg tracking-wide">Zenvio<span class="bg-gradient-to-r from-purple-400 to-blue-400 -webkit-background-clip-text text-transparent bg-clip-text">GQ</span></span>
+            <button class="ml-auto lg:hidden text-gray-400" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
+
+        <!-- Nav -->
+        <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-8">
+            <!-- PRINCIPAL -->
+            <div>
+                <p class="px-3 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Principal</p>
+                <a href="#" onclick="navigate('dashboard')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group mb-1">
+                    <i class="fas fa-chart-pie w-6 text-center group-hover:text-purple-400 transition-colors"></i> Dashboard
+                </a>
+                <a href="#" onclick="navigate('agentes')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group mb-1">
+                    <i class="fas fa-robot w-6 text-center group-hover:text-blue-400 transition-colors"></i> Agentes
+                    <span id="nav-agent-count" class="ml-auto bg-purple-500/20 text-purple-400 text-[10px] px-2 py-0.5 rounded-full">0</span>
+                </a>
+                <a href="#" onclick="navigate('produccion')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
+                    <i class="fas fa-layer-group w-6 text-center group-hover:text-green-400 transition-colors"></i> Producción
+                </a>
+            </div>
+
+            <!-- INTELIGENCIA -->
+            <div>
+                <p class="px-3 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Inteligencia</p>
+                <a href="#" onclick="navigate('director')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group mb-1 bg-gradient-to-r hover:from-purple-900/20 hover:to-transparent border-l-2 border-transparent hover:border-purple-500">
+                    <i class="fas fa-crown w-6 text-center text-yellow-500"></i> Director General
+                </a>
+                <a href="#" onclick="navigate('documentos')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
+                    <i class="fas fa-file-pdf w-6 text-center group-hover:text-red-400 transition-colors"></i> Documentos
+                    <span id="nav-doc-count" class="ml-auto bg-gray-800 text-gray-300 text-[10px] px-2 py-0.5 rounded-full">0</span>
+                </a>
+            </div>
+
+            <!-- CANALES -->
+            <div>
+                <p class="px-3 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Canales</p>
+                <a href="#" onclick="navigate('tube')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group mb-1">
+                    <i class="fas fa-play-circle w-6 text-center group-hover:text-red-500 transition-colors"></i> Tube Automate
+                </a>
+                <a href="#" onclick="navigate('shorts')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
+                    <i class="fas fa-bolt w-6 text-center group-hover:text-cyan-400 transition-colors"></i> Shorts System
+                </a>
+            </div>
+
+            <!-- ANALÍTICA -->
+            <div>
+                <p class="px-3 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Analítica</p>
+                <a href="#" onclick="navigate('studio')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group mb-1">
+                    <i class="fas fa-chart-line w-6 text-center group-hover:text-green-500 transition-colors"></i> YouTube Studio
+                </a>
+                <a href="#" onclick="navigate('ingresos')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
+                    <i class="fas fa-dollar-sign w-6 text-center group-hover:text-emerald-400 transition-colors"></i> Ingresos
+                </a>
+            </div>
+        </nav>
+
+        <!-- Footer -->
+        <div class="p-4 border-t border-[#1a1a2e] bg-black/20">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
+                    <i class="fas fa-user text-gray-400 text-xs"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-white">Administrador</p>
+                    <p class="text-[10px] text-gray-500">Operator → Manager</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col lg:ml-[240px] h-screen bg-[#000000]">
+        
+        <!-- TOPBAR -->
+        <header class="h-16 border-b border-[#1a1a2e] bg-[#000000]/80 backdrop-blur-md flex items-center justify-between px-6 z-30 sticky top-0">
+            <div class="flex items-center gap-4">
+                <button class="lg:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+                <h1 id="topbar-title" class="text-lg font-semibold tracking-wide">Dashboard</h1>
+                <div class="hidden sm:flex items-center gap-2 bg-[#111118] border border-[#1a1a2e] px-3 py-1.5 rounded-full">
+                    <div class="dot-active"></div>
+                    <span class="text-xs text-gray-300 font-medium">Sistema Activo</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <!-- Counters -->
+                <div class="hidden md:flex gap-4 text-xs font-medium">
+                    <div class="flex flex-col items-end"><span class="text-gray-500 text-[10px] uppercase">Activos</span><span id="top-count-agents" class="text-purple-400">0</span></div>
+                    <div class="flex flex-col items-end"><span class="text-gray-500 text-[10px] uppercase">Pendientes</span><span id="top-count-pending" class="text-orange-400">0</span></div>
+                    <div class="flex flex-col items-end"><span class="text-gray-500 text-[10px] uppercase">En Proceso</span><span id="top-count-process" class="text-blue-400">0</span></div>
+                    <div class="flex flex-col items-end"><span class="text-gray-500 text-[10px] uppercase">Completadas</span><span id="top-count-done" class="text-green-400">0</span></div>
+                </div>
+                
+                <!-- Action Button -->
+                <button id="topbar-action-btn" onclick="handleTopbarAction()" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow-lg shadow-purple-500/20 transition-all hidden">
+                    <i class="fas fa-plus mr-1"></i> <span id="topbar-action-text">Nuevo</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- SCROLLABLE CONTENT AREA -->
+        <div id="content-area" class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
+            
+            <!-- SECTION: DASHBOARD -->
+            <section id="sec-dashboard" class="space-y-8">
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-card p-5 border-t-2 border-t-purple-500 relative overflow-hidden group">
+                        <div class="absolute -right-6 -top-6 text-purple-500/10 group-hover:text-purple-500/20 transition-colors"><i class="fas fa-robot text-7xl"></i></div>
+                        <p class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Agentes Activos</p>
+                        <h3 id="stat-agents" class="text-3xl font-black text-white">0</h3>
+                        <p class="text-xs text-gray-500 mt-2">En el sistema ZenvioGQ</p>
+                    </div>
+                    <div class="glass-card p-5 border-t-2 border-t-orange-500 relative overflow-hidden group">
+                        <div class="absolute -right-6 -top-6 text-orange-500/10 group-hover:text-orange-500/20 transition-colors"><i class="fas fa-clock text-7xl"></i></div>
+                        <p class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Pendientes</p>
+                        <h3 id="stat-pending" class="text-3xl font-black text-white">0</h3>
+                        <p class="text-xs text-gray-500 mt-2">Esperando ejecución</p>
+                    </div>
+                    <div class="glass-card p-5 border-t-2 border-t-blue-500 relative overflow-hidden group">
+                        <div class="absolute -right-6 -top-6 text-blue-500/10 group-hover:text-blue-500/20 transition-colors"><i class="fas fa-spinner text-7xl"></i></div>
+                        <p class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">En Proceso</p>
+                        <h3 id="stat-process" class="text-3xl font-black text-white">0</h3>
+                        <p class="text-xs text-gray-500 mt-2">Trabajando ahora</p>
+                    </div>
+                    <div class="glass-card p-5 border-t-2 border-t-green-500 relative overflow-hidden group">
+                        <div class="absolute -right-6 -top-6 text-green-500/10 group-hover:text-green-500/20 transition-colors"><i class="fas fa-check-circle text-7xl"></i></div>
+                        <p class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Completadas</p>
+                        <h3 id="stat-done" class="text-3xl font-black text-white">0</h3>
+                        <p class="text-xs text-gray-500 mt-2">Tareas finalizadas</p>
+                    </div>
+                </div>
+
+                <!-- Resumen Agentes -->
+                <div>
+                    <h2 class="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2"><i class="fas fa-users text-purple-500"></i> Escuadrón Activo</h2>
+                    <div id="dash-agents-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <!-- Resumen Kanban -->
+                <div>
+                    <h2 class="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2"><i class="fas fa-stream text-blue-500"></i> Flujo de Trabajo</h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <div class="glass-card p-4 border-t-2 border-t-orange-500">
+                            <h3 class="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">Pendientes</h3>
+                            <div id="dash-col-pending" class="space-y-2"></div>
+                        </div>
+                        <div class="glass-card p-4 border-t-2 border-t-blue-500">
+                            <h3 class="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">En Proceso</h3>
+                            <div id="dash-col-process" class="space-y-2"></div>
+                        </div>
+                        <div class="glass-card p-4 border-t-2 border-t-green-500">
+                            <h3 class="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">Completadas</h3>
+                            <div id="dash-col-done" class="space-y-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: AGENTES -->
+            <section id="sec-agentes" class="section-hidden">
+                <div id="agents-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <!-- Filled by JS -->
+                </div>
+            </section>
+
+            <!-- SECTION: PRODUCCION (KANBAN) -->
+            <section id="sec-produccion" class="section-hidden h-full">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full pb-10">
+                    <!-- Pending -->
+                    <div class="flex flex-col h-full">
+                        <div class="flex items-center justify-between mb-3 px-1">
+                            <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-orange-500"></div><h3 class="font-semibold">Pendientes</h3></div>
+                            <span id="kb-count-pending" class="bg-orange-500/10 text-orange-500 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                        </div>
+                        <div id="kb-pending" class="kanban-col flex-1 bg-[#0a0a0f] border border-[#1a1a2e] rounded-xl p-3 space-y-3 overflow-y-auto" ondragover="allowDrop(event)" ondrop="drop(event, 'pending')"></div>
+                    </div>
+                    <!-- Process -->
+                    <div class="flex flex-col h-full">
+                        <div class="flex items-center justify-between mb-3 px-1">
+                            <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-blue-500"></div><h3 class="font-semibold">En Proceso</h3></div>
+                            <span id="kb-count-process" class="bg-blue-500/10 text-blue-500 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                        </div>
+                        <div id="kb-process" class="kanban-col flex-1 bg-[#0a0a0f] border border-[#1a1a2e] rounded-xl p-3 space-y-3 overflow-y-auto" ondragover="allowDrop(event)" ondrop="drop(event, 'process')"></div>
+                    </div>
+                    <!-- Done -->
+                    <div class="flex flex-col h-full">
+                        <div class="flex items-center justify-between mb-3 px-1">
+                            <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-green-500"></div><h3 class="font-semibold">Completadas</h3></div>
+                            <span id="kb-count-done" class="bg-green-500/10 text-green-500 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                        </div>
+                        <div id="kb-done" class="kanban-col flex-1 bg-[#0a0a0f] border border-[#1a1a2e] rounded-xl p-3 space-y-3 overflow-y-auto" ondragover="allowDrop(event)" ondrop="drop(event, 'done')"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: DIRECTOR GENERAL -->
+            <section id="sec-director" class="section-hidden max-w-5xl mx-auto h-[calc(100vh-120px)] flex flex-col">
+                
+                <!-- Chat Header & Config -->
+                <div class="glass-card p-4 mb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 p-0.5">
+                            <div class="w-full h-full bg-black rounded-full flex items-center justify-center text-xl">👑</div>
+                        </div>
+                        <div>
+                            <h2 class="font-bold text-lg flex items-center gap-2">Director General <span class="bg-green-500/20 text-green-400 text-[10px] px-2 py-0.5 rounded-full border border-green-500/30">Online</span></h2>
+                            <p class="text-xs text-gray-400">Orquestador principal IA de ZenvioGQ</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto">
+                        <input type="text" id="n8n-webhook-url" placeholder="URL Webhook n8n" value="http://localhost:5678/webhook/director-general" class="w-full sm:w-64 bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-purple-500">
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <button onclick="testWebhook()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg text-xs transition-colors border border-gray-700"><i class="fas fa-plug text-blue-400 mr-1"></i> Probar</button>
+                            <button onclick="navigate('documentos')" class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg text-xs transition-colors border border-gray-700"><i class="fas fa-file-pdf text-red-400 mr-1"></i> Contexto</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Suggestions -->
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <button onclick="sendSuggestion('¿Cuál es mi primer paso para automatizar?')" class="bg-[#111118] border border-[#1a1a2e] hover:border-purple-500 hover:bg-purple-500/10 text-xs px-3 py-1.5 rounded-full text-gray-300 transition-colors">🚀 Primer paso</button>
+                    <button onclick="sendSuggestion('Dame 5 ideas virales para Shorts de tecnología')" class="bg-[#111118] border border-[#1a1a2e] hover:border-purple-500 hover:bg-purple-500/10 text-xs px-3 py-1.5 rounded-full text-gray-300 transition-colors">⚡ Ideas Shorts</button>
+                    <button onclick="sendSuggestion('Crea las tareas iniciales para un video de 10 min')" class="bg-[#111118] border border-[#1a1a2e] hover:border-purple-500 hover:bg-purple-500/10 text-xs px-3 py-1.5 rounded-full text-gray-300 transition-colors">📋 Crear tareas</button>
+                    <button onclick="sendSuggestion('Resúmeme los documentos subidos')" class="bg-[#111118] border border-[#1a1a2e] hover:border-purple-500 hover:bg-purple-500/10 text-xs px-3 py-1.5 rounded-full text-gray-300 transition-colors">📚 Resumir PDF</button>
+                    <button onclick="sendSuggestion('Dame la fórmula para títulos virales')" class="bg-[#111118] border border-[#1a1a2e] hover:border-purple-500 hover:bg-purple-500/10 text-xs px-3 py-1.5 rounded-full text-gray-300 transition-colors">🎯 Títulos</button>
+                </div>
+
+                <!-- Messages Area -->
+                <div id="chat-messages" class="flex-1 bg-[#0a0a0f] border border-[#1a1a2e] rounded-xl p-4 overflow-y-auto space-y-4 mb-4">
+                    <!-- Welcome Msg -->
+                    <div class="flex justify-start">
+                        <div class="max-w-[85%] sm:max-w-[75%] bg-[#111118] border border-[#1a1a2e] rounded-2xl rounded-tl-sm p-4 shadow-lg shadow-black/50 relative">
+                            <span class="absolute -top-2.5 left-4 bg-yellow-500/20 border border-yellow-500/50 text-yellow-500 text-[9px] font-bold px-2 py-0.5 rounded-full">👑 Director</span>
+                            <p class="text-sm text-gray-200 mt-1">Saludos. Soy tu Director General. Estoy conectado a Supabase y tengo acceso a tus documentos. Puedo crear agentes y tareas automáticamente si me lo pides. ¿En qué trabajamos hoy?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="glass-card p-2 flex items-center gap-2">
+                    <input type="text" id="chat-input" placeholder="Escribe un mensaje al Director General... (Ej: Crea una tarea para editar el video)" class="flex-1 bg-transparent text-white px-4 py-3 focus:outline-none text-sm placeholder-gray-600" onkeypress="handleChatKeypress(event)">
+                    <button onclick="sendChatMessage()" class="w-10 h-10 rounded-lg bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center transition-colors shadow-lg shadow-purple-500/20"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </section>
+
+            <!-- SECTION: DOCUMENTOS -->
+            <section id="sec-documentos" class="section-hidden max-w-5xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2 space-y-6">
+                        <!-- Dropzone -->
+                        <div id="dropzone" class="border-2 border-dashed border-[#2d2d50] rounded-2xl bg-[#0a0a0f] hover:bg-[#111118] hover:border-purple-500 transition-all p-10 flex flex-col items-center justify-center text-center cursor-pointer relative" onclick="document.getElementById('pdf-upload').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+                            <input type="file" id="pdf-upload" accept="application/pdf" class="hidden" onchange="handleFileSelect(event)">
+                            <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4 text-red-500">
+                                <i class="fas fa-cloud-upload-alt text-3xl"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-white mb-2">Sube tus PDFs de Conocimiento</h3>
+                            <p class="text-sm text-gray-500 max-w-sm">Arrastra y suelta documentos aquí o haz click para buscar. El texto será extraído y usado como contexto por el Director General.</p>
+                            
+                            <!-- Progress Overlay -->
+                            <div id="upload-progress" class="absolute inset-0 bg-black/90 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center hidden">
+                                <i class="fas fa-circle-notch fa-spin text-purple-500 text-3xl mb-3"></i>
+                                <p id="upload-status-text" class="text-sm font-medium text-white">Extrayendo texto...</p>
+                            </div>
+                        </div>
+
+                        <!-- Lista Docs -->
+                        <div class="glass-card p-5">
+                            <h3 class="text-sm font-semibold mb-4 border-b border-[#1a1a2e] pb-2">Base de Conocimiento Actual</h3>
+                            <div id="docs-list" class="space-y-3">
+                                <!-- Filled by JS -->
+                                <p class="text-center text-gray-500 py-4 text-xs italic">No hay documentos subidos</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info Box -->
+                    <div class="glass-card p-5 h-fit border-t-2 border-t-red-500">
+                        <h3 class="font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-info-circle text-red-400"></i> ¿Cómo funciona?</h3>
+                        <ol class="space-y-4 text-xs text-gray-400">
+                            <li class="flex gap-3"><span class="w-5 h-5 rounded bg-gray-800 flex items-center justify-center text-white shrink-0">1</span>Sube un PDF (Guiones, estrategias, analíticas).</li>
+                            <li class="flex gap-3"><span class="w-5 h-5 rounded bg-gray-800 flex items-center justify-center text-white shrink-0">2</span>El sistema extrae el texto localmente en tu navegador usando <span class="text-purple-400 font-semibold">PDF.js</span>.</li>
+                            <li class="flex gap-3"><span class="w-5 h-5 rounded bg-gray-800 flex items-center justify-center text-white shrink-0">3</span>Se guarda en la base de datos de Supabase.</li>
+                            <li class="flex gap-3"><span class="w-5 h-5 rounded bg-gray-800 flex items-center justify-center text-white shrink-0">4</span>Al hablar con el Director General, este texto se envía como <span class="text-blue-400 font-semibold">contexto</span> en el Webhook.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: INFO CARDS (TUBE, SHORTS, STUDIO, INGRESOS) -->
+            <section id="sec-info" class="section-hidden">
+                <h2 id="info-title" class="text-xl font-bold mb-6 flex items-center gap-2">Título</h2>
+                <div id="info-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Injected dynamically -->
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- MODALS -->
+    <!-- Modal Agente -->
+    <div id="modal-agent" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center p-4">
+        <div class="bg-[#0a0a0f] border border-[#1a1a2e] rounded-2xl w-full max-w-md overflow-hidden transform transition-all shadow-2xl">
+            <div class="px-6 py-4 border-b border-[#1a1a2e] flex justify-between items-center bg-[#111118]">
+                <h3 class="font-bold text-lg" id="modal-agent-title">Crear Agente</h3>
+                <button onclick="closeModal('modal-agent')" class="text-gray-500 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="form-agent" class="p-6 space-y-4" onsubmit="saveAgent(event)">
+                <input type="hidden" id="ag-id">
+                <div><label class="block text-xs text-gray-400 mb-1">Nombre *</label><input type="text" id="ag-name" required class="w-full bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none"></div>
+                <div><label class="block text-xs text-gray-400 mb-1">Descripción</label><input type="text" id="ag-sub" class="w-full bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none"></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Sistema</label>
+                        <select id="ag-system" class="w-full bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none">
+                            <option value="ambos">🔄 Ambos</option>
+                            <option value="tube">🎬 Tube Automate</option>
+                            <option value="shorts">⚡ Shorts System</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Color</label>
+                        <div class="flex items-center justify-between gap-1 pt-1">
+                            <button type="button" onclick="selectColor('col-purple')" class="color-btn w-6 h-6 rounded bg-purple-500 border-2 border-white ring-2 ring-purple-500/50" data-color="col-purple"></button>
+                            <button type="button" onclick="selectColor('col-blue')" class="color-btn w-6 h-6 rounded bg-blue-500 border-2 border-transparent hover:border-gray-500" data-color="col-blue"></button>
+                            <button type="button" onclick="selectColor('col-green')" class="color-btn w-6 h-6 rounded bg-green-500 border-2 border-transparent hover:border-gray-500" data-color="col-green"></button>
+                            <button type="button" onclick="selectColor('col-orange')" class="color-btn w-6 h-6 rounded bg-orange-500 border-2 border-transparent hover:border-gray-500" data-color="col-orange"></button>
+                            <button type="button" onclick="selectColor('col-pink')" class="color-btn w-6 h-6 rounded bg-pink-500 border-2 border-transparent hover:border-gray-500" data-color="col-pink"></button>
+                            <button type="button" onclick="selectColor('col-yellow')" class="color-btn w-6 h-6 rounded bg-yellow-500 border-2 border-transparent hover:border-gray-500" data-color="col-yellow"></button>
+                        </div>
+                        <input type="hidden" id="ag-color" value="col-purple">
+                    </div>
+                </div>
+                <div><label class="block text-xs text-gray-400 mb-1">URL Webhook n8n (Opcional)</label><input type="text" id="ag-n8n" class="w-full bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none"></div>
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeModal('modal-agent')" class="flex-1 bg-gray-800 text-white py-2 rounded-lg text-sm font-medium hover:bg-gray-700">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-purple-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-purple-500">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Tarea -->
+    <div id="modal-task" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center p-4">
+        <div class="bg-[#0a0a0f] border border-[#1a1a2e] rounded-2xl w-full max-w-md overflow-hidden transform transition-all shadow-2xl">
+            <div class="px-6 py-4 border-b border-[#1a1a2e] flex justify-between items-center bg-[#111118]">
+                <h3 class="font-bold text-lg" id="modal-task-title">Crear Tarea</h3>
+                <button onclick="closeModal('modal-task')" class="text-gray-500 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="form-task" class="p-6 space-y-4" onsubmit="saveTask(event)">
+                <input type="hidden" id="tk-id">
+                <div><label class="block text-xs text-gray-400 mb-1">Título *</label><input type="text" id="tk-title" required class="w-full bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none"></div>
+                <div><label class="block text-xs text-gray-400 mb-1">Descripción</label><textarea id="tk-desc" rows="2" class="w-full bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none"></textarea></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Agente Asignado</label>
+                        <select id="tk-agent" class="w-full bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none">
+                            <option value="">Sin asignar</option>
+                            <!-- Filled dynamically -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Estado</label>
+                        <select id="tk-status" class="w-full bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none">
+                            <option value="pending">Pendiente</option>
+                            <option value="process">En Proceso</option>
+                            <option value="done">Completada</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeModal('modal-task')" class="flex-1 bg-gray-800 text-white py-2 rounded-lg text-sm font-medium hover:bg-gray-700">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-500">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[60] flex flex-col gap-2"></div>
+
+    <!-- MAIN SCRIPT -->
+    <script>
+        /* =================================================================================
+           INSTRUCCIONES IMPORTANTES:
+           Como borraste tu proyecto de Supabase anterior, necesitas crear uno nuevo.
+           Pega la NUEVA URL y ANON KEY de tu nuevo proyecto de Supabase en las variables 
+           'SUPA_URL' y 'SUPA_KEY' de abajo.
+           ================================================================================= */
+        const SUPA_URL = "https://tmtigikluepahdynifgo.supabase.co"; // <-- REEMPLAZA ESTO
+        const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtdGlnaWtsdWVwYWhkeW5pZmdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNjI4MTYsImV4cCI6MjA5MDczODgxNn0.p5GjDSBDyUGVEw0kP749Ho1MPX3blnachpqVHwu3ll4"; // <-- REEMPLAZA ESTO
+
+        // Estado Global
+        let state = { currentSection: 'dashboard', agents: [], tasks: [], documents: [] };
+
+        // Headers base API REST
+        const headers = { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
+
+        /* ================= INICIALIZACIÓN ================= */
+        document.addEventListener('DOMContentLoaded', () => {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            loadData();
+            setInterval(loadData, 30000); // Auto-refresh 30s
+        });
+
+        /* ================= NAVEGACIÓN SPA ================= */
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('mobileOverlay');
+            sb.classList.toggle('-translate-x-full');
+            ov.classList.toggle('hidden');
+        }
+
+        function navigate(section) {
+            state.currentSection = section;
+            document.querySelectorAll('section').forEach(s => s.classList.add('section-hidden'));
+            
+            // Manage active styles in sidebar
+            document.querySelectorAll('.nav-link').forEach(l => {
+                l.classList.remove('bg-white/10', 'text-white');
+                if(l.getAttribute('onclick').includes(section)) l.classList.add('bg-white/10', 'text-white');
+            });
+            if(window.innerWidth < 1024) toggleSidebar();
+
+            const topTitle = document.getElementById('topbar-title');
+            const actionBtn = document.getElementById('topbar-action-btn');
+            actionBtn.classList.add('hidden');
+
+            if(['dashboard', 'agentes', 'produccion', 'director', 'documentos'].includes(section)) {
+                document.getElementById('sec-' + section).classList.remove('section-hidden');
+            } else {
+                document.getElementById('sec-info').classList.remove('section-hidden');
+                renderInfoCards(section);
+            }
+
+            // Contextual Topbar
+            switch(section) {
+                case 'dashboard': topTitle.innerHTML = '<i class="fas fa-chart-pie mr-2 text-purple-400"></i> Dashboard'; break;
+                case 'agentes': topTitle.innerHTML = '<i class="fas fa-robot mr-2 text-blue-400"></i> Gestión de Agentes'; actionBtn.classList.remove('hidden'); document.getElementById('topbar-action-text').innerText = 'Nuevo Agente'; break;
+                case 'produccion': topTitle.innerHTML = '<i class="fas fa-layer-group mr-2 text-green-400"></i> Producción'; actionBtn.classList.remove('hidden'); document.getElementById('topbar-action-text').innerText = 'Nueva Tarea'; break;
+                case 'director': topTitle.innerHTML = '<i class="fas fa-crown mr-2 text-yellow-500"></i> Director General'; break;
+                case 'documentos': topTitle.innerHTML = '<i class="fas fa-file-pdf mr-2 text-red-400"></i> Documentos'; break;
+            }
+        }
+
+        function handleTopbarAction() {
+            if(state.currentSection === 'agentes') openAgentModal();
+            else if(state.currentSection === 'produccion') openTaskModal();
+        }
+
+        /* ================= SUPABASE API ================= */
+        async function fetchAPI(table, method = 'GET', body = null, id = null) {
+            const url = `${SUPA_URL}/rest/v1/${table}${id ? `?id=eq.${id}` : '?select=*'}`;
+            try {
+                const res = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : null });
+                if(!res.ok) throw new Error(`Error: ${res.status}`);
+                return method === 'GET' || method === 'POST' ? await res.json() : true;
+            } catch(e) {
+                console.error(e);
+                showToast("Error de conexión con Supabase", "error");
+                return null;
+            }
+        }
+
+        async function loadData() {
+            const [ag, tk, dc] = await Promise.all([ fetchAPI('agents'), fetchAPI('tasks'), fetchAPI('documents') ]);
+            if(ag) state.agents = ag;
+            if(tk) state.tasks = tk;
+            if(dc) state.documents = dc;
+            
+            updateCounters();
+            renderDashboard();
+            renderAgents();
+            renderKanban();
+            renderDocs();
+        }
+
+        /* ================= RENDERIZADO ================= */
+        function updateCounters() {
+            const activeAg = state.agents.filter(a => a.status === 'active').length;
+            const pend = state.tasks.filter(t => t.status === 'pending').length;
+            const proc = state.tasks.filter(t => t.status === 'process').length;
+            const done = state.tasks.filter(t => t.status === 'done').length;
+
+            document.getElementById('stat-agents').innerText = activeAg;
+            document.getElementById('stat-pending').innerText = pend;
+            document.getElementById('stat-process').innerText = proc;
+            document.getElementById('stat-done').innerText = done;
+            
+            document.getElementById('top-count-agents').innerText = activeAg;
+            document.getElementById('top-count-pending').innerText = pend;
+            document.getElementById('top-count-process').innerText = proc;
+            document.getElementById('top-count-done').innerText = done;
+
+            document.getElementById('nav-agent-count').innerText = state.agents.length;
+            document.getElementById('nav-doc-count').innerText = state.documents.length;
+        }
+
+        function getIcon(name) {
+            const n = name.toLowerCase();
+            if(n.includes('dir')) return '👑'; if(n.includes('busc') || n.includes('idea')) return '🔍';
+            if(n.includes('guion') || n.includes('script')) return '✍️'; if(n.includes('voz') || n.includes('voice')) return '🎙️';
+            if(n.includes('visu') || n.includes('art')) return '🎨'; if(n.includes('edit')) return '🎬';
+            if(n.includes('publi')) return '📤'; if(n.includes('ana')) return '📊';
+            return '🤖';
+        }
+
+        function renderDashboard() {
+            // Agentes mini
+            const agGrid = document.getElementById('dash-agents-grid');
+            agGrid.innerHTML = state.agents.map(a => `
+                <div class="glass-card p-3 flex flex-col items-center justify-center text-center relative border-b-2 border-b-transparent ${a.color.replace('col-', 'border-b-')}">
+                    <div class="w-10 h-10 rounded-lg ${a.color}-bg bg-opacity-20 flex items-center justify-center text-lg mb-2 shadow-inner">${getIcon(a.name)}</div>
+                    <span class="text-xs font-bold truncate w-full">${a.name}</span>
+                    <div class="absolute top-2 right-2 ${a.status==='active'?'dot-active':'dot-paused'}"></div>
+                </div>
+            `).join('');
+
+            // Kanban mini
+            ['pending', 'process', 'done'].forEach(status => {
+                const col = document.getElementById(`dash-col-${status}`);
+                const tasks = state.tasks.filter(t => t.status === status).slice(0, 5); // top 5
+                col.innerHTML = tasks.length ? tasks.map(t => {
+                    const ag = state.agents.find(a => a.id === t.agent);
+                    const colorClass = ag ? ag.color : 'text-gray-500';
+                    return `<div class="bg-[#111118] p-2 rounded border border-[#1a1a2e] text-xs truncate flex justify-between items-center"><span class="truncate pr-2">${t.title}</span> <i class="fas fa-circle text-[8px] ${colorClass.replace('col-', 'text-')}"></i></div>`;
+                }).join('') : '<p class="text-[10px] text-gray-500 italic">Vacio</p>';
+            });
+        }
+
+        function renderAgents() {
+            const grid = document.getElementById('agents-grid');
+            grid.innerHTML = state.agents.map(a => {
+                const tasks = state.tasks.filter(t => t.agent === a.id);
+                const tagClass = a.system === 'tube' ? 'tag-tube' : (a.system === 'shorts' ? 'tag-shorts' : 'tag-ambos');
+                const tagText = a.system === 'tube' ? '🎬 Tube' : (a.system === 'shorts' ? '⚡ Shorts' : '🔄 Ambos');
+                
+                return `
+                <div class="glass-card p-5 ${a.color}-bar relative flex flex-col h-full">
+                    <div class="absolute top-4 right-4 bg-gray-800 text-[10px] px-2 py-0.5 rounded-full border border-gray-700 flex items-center gap-1">
+                        <div class="${a.status==='active'?'dot-active':'dot-paused'} w-1.5 h-1.5"></div> ${a.status==='active'?'Activo':'Pausado'}
+                    </div>
+                    <div class="flex items-center gap-4 mb-3">
+                        <div class="w-14 h-14 rounded-xl ${a.color}-bg bg-opacity-10 flex items-center justify-center text-2xl shadow-lg">${getIcon(a.name)}</div>
+                        <div>
+                            <h3 class="font-bold text-lg">${a.name}</h3>
+                            <span class="text-xs ${tagClass} px-2 py-0.5 rounded font-medium">${tagText}</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-4 flex-1">${a.sub || 'Sin descripción'}</p>
+                    
+                    <div class="grid grid-cols-3 gap-2 mb-4 bg-black/30 p-2 rounded-lg border border-white/5 text-center">
+                        <div><span class="block text-[10px] text-gray-500">PEND</span><span class="font-bold text-orange-400 text-xs">${tasks.filter(t=>t.status==='pending').length}</span></div>
+                        <div class="border-l border-r border-white/5"><span class="block text-[10px] text-gray-500">PROC</span><span class="font-bold text-blue-400 text-xs">${tasks.filter(t=>t.status==='process').length}</span></div>
+                        <div><span class="block text-[10px] text-gray-500">DONE</span><span class="font-bold text-green-400 text-xs">${tasks.filter(t=>t.status==='done').length}</span></div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="toggleAgentStatus('${a.id}')" class="flex-1 bg-gray-800 hover:bg-gray-700 py-1.5 rounded text-xs font-medium transition-colors border border-gray-700">
+                            ${a.status==='active' ? '<i class="fas fa-pause text-gray-400"></i> Pausar' : '<i class="fas fa-play text-green-400"></i> Activar'}
+                        </button>
+                        <button onclick="deleteAgent('${a.id}')" class="w-8 bg-gray-800 hover:bg-red-500/20 hover:text-red-500 py-1.5 rounded text-xs transition-colors border border-gray-700"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderKanban() {
+            ['pending', 'process', 'done'].forEach(status => {
+                const tasks = state.tasks.filter(t => t.status === status);
+                document.getElementById(`kb-count-${status}`).innerText = tasks.length;
+                
+                const col = document.getElementById(`kb-${status}`);
+                col.innerHTML = tasks.map(t => {
+                    const ag = state.agents.find(a => a.id === t.agent);
+                    const tagClass = ag ? ag.color + '-tag' : 'bg-gray-800 text-gray-400';
+                    const iconColor = ag ? ag.color.replace('col-', 'text-') : 'text-gray-500';
+                    
+                    return `
+                    <div class="bg-[#111118] border border-[#1a1a2e] hover:border-[#2d2d50] p-3 rounded-lg cursor-grab active:cursor-grabbing shadow-sm" draggable="true" ondragstart="drag(event, '${t.id}')">
+                        <h4 class="font-semibold text-sm mb-1">${t.title}</h4>
+                        ${t.description ? `<p class="text-xs text-gray-500 mb-3 line-clamp-2">${t.description}</p>` : ''}
+                        <div class="flex items-center justify-between mt-2">
+                            <span class="text-[10px] px-2 py-0.5 rounded font-medium ${tagClass} flex items-center gap-1"><i class="fas fa-robot ${iconColor}"></i> ${ag ? ag.name : 'Sin agente'}</span>
+                            <button onclick="deleteTask('${t.id}')" class="text-gray-600 hover:text-red-500 transition-colors"><i class="fas fa-trash text-xs"></i></button>
+                        </div>
+                    </div>`;
+                }).join('');
+            });
+        }
+
+        /* ================= DRAG & DROP ================= */
+        function drag(ev, id) { ev.dataTransfer.setData("id", id); }
+        function allowDrop(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drag-over'); }
+        async function drop(ev, status) {
+            ev.preventDefault();
+            document.querySelectorAll('.kanban-col').forEach(c => c.classList.remove('drag-over'));
+            const id = ev.dataTransfer.getData("id");
+            if(!id) return;
+            
+            // Update local instantly
+            const task = state.tasks.find(t => t.id === id);
+            if(task && task.status !== status) {
+                task.status = status;
+                renderKanban();
+                updateCounters();
+                renderDashboard();
+                // Update DB
+                await fetchAPI('tasks', 'PATCH', { status }, id);
+            }
+        }
+
+        /* ================= CRUD AGENTES ================= */
+        function openAgentModal() {
+            document.getElementById('form-agent').reset();
+            document.getElementById('ag-id').value = '';
+            document.getElementById('modal-agent-title').innerText = 'Crear Agente';
+            selectColor('col-purple');
+            document.getElementById('modal-agent').classList.remove('hidden');
+        }
+
+        function selectColor(color) {
+            document.getElementById('ag-color').value = color;
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                if(btn.dataset.color === color) { btn.classList.remove('border-transparent'); btn.classList.add('border-white', 'ring-2'); }
+                else { btn.classList.add('border-transparent'); btn.classList.remove('border-white', 'ring-2'); }
+            });
+        }
+
+        async function saveAgent(e) {
+            e.preventDefault();
+            const id = document.getElementById('ag-id').value;
+            const data = {
+                name: document.getElementById('ag-name').value,
+                sub: document.getElementById('ag-sub').value,
+                system: document.getElementById('ag-system').value,
+                color: document.getElementById('ag-color').value,
+                n8n_url: document.getElementById('ag-n8n').value,
+                icon: getIcon(document.getElementById('ag-name').value)
+            };
+            
+            const res = await fetchAPI('agents', id ? 'PATCH' : 'POST', data, id);
+            if(res) {
+                showToast(`Agente ${id ? 'actualizado' : 'creado'} con éxito`, "success");
+                closeModal('modal-agent');
+                loadData();
+            }
+        }
+
+        async function toggleAgentStatus(id) {
+            const ag = state.agents.find(a => a.id === id);
+            const newStatus = ag.status === 'active' ? 'paused' : 'active';
+            await fetchAPI('agents', 'PATCH', { status: newStatus }, id);
+            loadData();
+        }
+
+        async function deleteAgent(id) {
+            if(confirm('¿Eliminar agente? Las tareas asignadas quedarán sin agente.')) {
+                await fetchAPI('agents', 'DELETE', null, id);
+                showToast("Agente eliminado", "info");
+                loadData();
+            }
+        }
+
+        /* ================= CRUD TAREAS ================= */
+        function openTaskModal() {
+            document.getElementById('form-task').reset();
+            document.getElementById('tk-id').value = '';
+            
+            const sel = document.getElementById('tk-agent');
+            sel.innerHTML = '<option value="">Sin asignar</option>' + state.agents.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+            
+            document.getElementById('modal-task').classList.remove('hidden');
+        }
+
+        async function saveTask(e) {
+            e.preventDefault();
+            const data = {
+                title: document.getElementById('tk-title').value,
+                description: document.getElementById('tk-desc').value,
+                status: document.getElementById('tk-status').value
+            };
+            const ag = document.getElementById('tk-agent').value;
+            if(ag) data.agent = ag;
+
+            await fetchAPI('tasks', 'POST', data);
+            showToast("Tarea creada", "success");
+            closeModal('modal-task');
+            loadData();
+        }
+
+        async function deleteTask(id) {
+            await fetchAPI('tasks', 'DELETE', null, id);
+            loadData();
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        /* ================= DOCUMENTOS & PDF ================= */
+        function handleDragOver(e) { e.preventDefault(); document.getElementById('dropzone').classList.add('border-purple-500', 'bg-[#111118]'); }
+        function handleDragLeave(e) { e.preventDefault(); document.getElementById('dropzone').classList.remove('border-purple-500', 'bg-[#111118]'); }
+        function handleDrop(e) {
+            e.preventDefault();
+            handleDragLeave(e);
+            if(e.dataTransfer.files.length > 0) processFile(e.dataTransfer.files[0]);
+        }
+        function handleFileSelect(e) { if(e.target.files.length > 0) processFile(e.target.files[0]); }
+
+        async function processFile(file) {
+            if(file.type !== 'application/pdf') return showToast("Solo archivos PDF permitidos", "error");
+            
+            document.getElementById('upload-progress').classList.remove('hidden');
+            document.getElementById('upload-status-text').innerText = 'Leyendo PDF...';
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                let fullText = '';
+                
+                document.getElementById('upload-status-text').innerText = 'Extrayendo texto...';
+                for(let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    fullText += content.items.map(item => item.str).join(' ') + '\n';
+                }
+
+                // Limitar y limpiar texto
+                fullText = fullText.replace(/\s+/g, ' ').substring(0, 45000); 
+
+                document.getElementById('upload-status-text').innerText = 'Guardando en Supabase...';
+                
+                const data = {
+                    name: file.name.replace('.pdf', ''),
+                    file_name: file.name,
+                    file_size: file.size,
+                    content_text: fullText
+                };
+
+                await fetchAPI('documents', 'POST', [data]);
+                showToast("Documento procesado y guardado", "success");
+                loadData();
+            } catch(e) {
+                console.error(e);
+                showToast("Error procesando el PDF", "error");
+            } finally {
+                document.getElementById('upload-progress').classList.add('hidden');
+            }
+        }
+
+        function renderDocs() {
+            const list = document.getElementById('docs-list');
+            list.innerHTML = state.documents.length ? state.documents.map(d => `
+                <div class="flex items-center justify-between bg-[#111118] p-3 rounded-lg border border-[#1a1a2e]">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-file-pdf text-red-500 text-xl"></i>
+                        <div>
+                            <p class="text-sm font-semibold truncate w-40 sm:w-64">${d.name}</p>
+                            <p class="text-[10px] text-gray-500">${(d.file_size/1024).toFixed(1)} KB • ${(d.content_text?.length || 0).toLocaleString()} chars</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-green-400 bg-green-500/10 px-2 py-0.5 rounded flex items-center gap-1"><i class="fas fa-check"></i> Listo</span>
+                        <button onclick="deleteDoc('${d.id}')" class="text-gray-500 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('') : '<p class="text-center text-gray-500 py-4 text-xs italic">No hay documentos subidos</p>';
+        }
+
+        async function deleteDoc(id) { await fetchAPI('documents', 'DELETE', null, id); loadData(); }
+
+        /* ================= CHAT & WEBHOOK ================= */
+        function appendMsg(text, isBot = false, isSystem = false) {
+            const container = document.getElementById('chat-messages');
+            let html = '';
+            
+            if(isSystem) {
+                html = `<div class="flex justify-center"><div class="bg-green-500/10 border border-green-500/30 text-green-400 text-xs px-3 py-1.5 rounded-full shadow-sm">${text}</div></div>`;
+            } else if(isBot) {
+                html = `<div class="flex justify-start"><div class="max-w-[85%] sm:max-w-[75%] bg-[#111118] border border-[#1a1a2e] rounded-2xl rounded-tl-sm p-4 shadow-lg relative"><span class="absolute -top-2.5 left-4 bg-yellow-500/20 border border-yellow-500/50 text-yellow-500 text-[9px] font-bold px-2 py-0.5 rounded-full">👑 Director</span><p class="text-sm text-gray-200 mt-1 whitespace-pre-wrap">${text}</p></div></div>`;
+            } else {
+                html = `<div class="flex justify-end"><div class="max-w-[85%] sm:max-w-[75%] bg-purple-600 rounded-2xl rounded-tr-sm p-3 shadow-lg shadow-purple-500/20 text-white"><p class="text-sm">${text}</p></div></div>`;
+            }
+            
+            container.insertAdjacentHTML('beforeend', html);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showTyping() {
+            const id = 'typing-' + Date.now();
+            const html = `<div id="${id}" class="flex justify-start"><div class="bg-[#111118] border border-[#1a1a2e] rounded-2xl rounded-tl-sm py-2 px-4"><div class="flex gap-1"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>`;
+            document.getElementById('chat-messages').insertAdjacentHTML('beforeend', html);
+            return id;
+        }
+
+        function sendSuggestion(text) { document.getElementById('chat-input').value = text; sendChatMessage(); }
+        function handleChatKeypress(e) { if(e.key === 'Enter') sendChatMessage(); }
+
+        async function testWebhook() {
+            const url = document.getElementById('n8n-webhook-url').value;
+            if(!url) return showToast("Ingresa una URL de webhook", "error");
+            try {
+                const res = await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ message: "ping" }) });
+                if(res.ok) showToast("Conexión exitosa con n8n", "success");
+                else throw new Error("Status " + res.status);
+            } catch(e) { showToast("Error conectando a n8n: " + e.message, "error"); }
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if(!msg) return;
+            
+            appendMsg(msg, false);
+            input.value = '';
+            const typeId = showTyping();
+            
+            const contextDocs = state.documents.map(d => `[DOC: ${d.name}]\n${d.content_text}`).join('\n\n---\n\n');
+            const url = document.getElementById('n8n-webhook-url').value;
+
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg, context: contextDocs, user_id: "admin" })
+                });
+
+                document.getElementById(typeId).remove();
+
+                if(!res.ok) throw new Error("Error HTTP");
+                
+                const data = await res.json();
+                const botReply = data.response || (data.candidates && data.candidates[0].content.parts[0].text) || JSON.stringify(data);
+                
+                appendMsg(botReply, true);
+
+                // Automations
+                if(botReply.includes('[CREAR_TAREA]') || botReply.includes('[CREAR_AGENTE]')) {
+                    setTimeout(() => {
+                        loadData();
+                        appendMsg("✅ Automatización detectada. Datos sincronizados con Supabase.", false, true);
+                    }, 2000);
+                }
+
+            } catch(e) {
+                document.getElementById(typeId).remove();
+                appendMsg("❌ Error de conexión con el Webhook. Verifica que n8n esté activo y la URL sea correcta.", true);
+            }
+        }
+
+        /* ================= INFO SECTIONS ================= */
+        const infoData = {
+            tube: {
+                title: '<i class="fas fa-play-circle text-red-500"></i> Tube Automate',
+                cards: [
+                    { t: "Roles System", i: "fa-users", c: "text-blue-400", d: "Operator (100% execution) → Manager (QA & Systems) → Owner (Strategy)" },
+                    { t: "The Trifecta", i: "fa-triangle-exclamation", c: "text-orange-400", d: "1. Crack Videos<br>2. Search Videos<br>3. Trending Videos" },
+                    { t: "Triumvirate", i: "fa-crown", c: "text-yellow-400", d: "• Titles: <50 chars, EMV 40%+<br>• Thumbnails: ≤4 words, high contrast<br>• Watch Time: Hook 3s, Pattern breaks" }
+                ]
+            },
+            shorts: {
+                title: '<i class="fas fa-bolt text-cyan-400"></i> Shorts System',
+                cards: [
+                    { t: "Viral Formula", i: "fa-fire", c: "text-orange-500", d: "'The + Emotion + Character + Ever'<br>Example: The SADDEST Dog Ever 😭" },
+                    { t: "10 Sources", i: "fa-database", c: "text-green-400", d: "Google News, Reddit, YouTube, TikTok, Facebook, Twitter, IG, Pinterest, Quora, Newsletters" },
+                    { t: "Retention Matrix", i: "fa-magnet", c: "text-purple-400", d: "Hook (0-3s): Visually shocking<br>Body: Fast paced, no dead air<br>Reward: Only at the very last second" }
+                ]
+            },
+            studio: {
+                title: '<i class="fas fa-chart-line text-green-500"></i> YouTube Studio',
+                cards: [
+                    { t: "Studio Access", i: "fa-external-link-alt", c: "text-red-500", d: "<button onclick='window.open(\"https://studio.youtube.com\")' class='mt-2 bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-xs font-bold w-full'>Abrir YT Studio</button>" },
+                    { t: "Rule of Revision", i: "fa-sync", c: "text-blue-400", d: "Evalúa cada 10 videos. Si no hay mejora en vistas/retención, cambia 1 variable (Miniatura, Hook o Temática)." },
+                    { t: "Key Metrics", i: "fa-bullseye", c: "text-green-400", d: "• CTR a las 3h: Objetivo ≥7%<br>• AVD (Average View Duration): ≥50%<br>• Swipe-away (Shorts): ≤30%" }
+                ]
+            },
+            ingresos: {
+                title: '<i class="fas fa-dollar-sign text-emerald-400"></i> Monetización',
+                cards: [
+                    { t: "Roadmap to $5K/mo", i: "fa-map", c: "text-purple-400", d: "Meta: 100K Views mensuales<br>$1K Ads + $500 Brands + $2.5K Products + $1K Affiliates" },
+                    { t: "The 5 Methods", i: "fa-list-ol", c: "text-emerald-400", d: "1. Affiliates (Day 1)<br>2. Ad Revenue (1K Subs)<br>3. Brand Deals (5K Subs)<br>4. Own Products (5K Subs)<br>5. Exclusive Community" }
+                ]
+            }
+        };
+
+        function renderInfoCards(section) {
+            const data = infoData[section];
+            if(!data) return;
+            document.getElementById('info-title').innerHTML = data.title;
+            document.getElementById('info-content').innerHTML = data.cards.map(c => `
+                <div class="glass-card p-6 border-t-2 border-t-[#2d2d50]">
+                    <div class="w-12 h-12 rounded-lg bg-[#111118] border border-[#1a1a2e] flex items-center justify-center mb-4"><i class="fas ${c.i} ${c.c} text-xl"></i></div>
+                    <h3 class="font-bold text-lg mb-2">${c.t}</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">${c.d}</p>
+                </div>
+            `).join('');
+        }
+
+        /* ================= UTILS ================= */
+        function showToast(msg, type="info") {
+            const colors = { success: "border-green-500 text-green-400 bg-green-500/10", error: "border-red-500 text-red-400 bg-red-500/10", info: "border-blue-500 text-blue-400 bg-blue-500/10" };
+            const icons = { success: "fa-check-circle", error: "fa-exclamation-circle", info: "fa-info-circle" };
+            
+            const toast = document.createElement('div');
+            toast.className = `toast flex items-center gap-3 px-4 py-3 rounded-xl border ${colors[type]} backdrop-blur-md shadow-lg`;
+            toast.innerHTML = `<i class="fas ${icons[type]} text-lg"></i> <span class="text-sm font-medium">${msg}</span>`;
+            
+            document.getElementById('toast-container').appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+    </script>
+</body>
+</html>
