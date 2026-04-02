@@ -3,1014 +3,1356 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZenvioGQ - Gestión de Agentes IA</title>
-    
-    <!-- Fuentes e Iconos -->
+    <title>ZenvioGQ - AI Agent Management</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Tailwind CSS (Browser) -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- PDF.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        dark: '#000000',
+                        sidebar: '#060609',
+                        modal: '#0a0a0f',
+                        card: '#111118',
+                        border: '#1a1a2e',
+                        borderHover: '#2d2d50',
+                        primary: '#6366f1',
+                        textPrimary: '#ffffff',
+                        textSecondary: '#e0e0e0',
+                        textMuted: '#6b7280',
+                        textDim: '#4b5563'
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
-        
-        /* Custom Scrollbar */
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #1a1a2e; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #2d2d50; }
 
-        /* Glassmorphism & Utilities */
-        .glass { background: rgba(17, 17, 24, 0.7); backdrop-filter: blur(10px); border: 1px solid #1a1a2e; }
-        .glass-card { background: #0a0a0f; border: 1px solid #1a1a2e; border-radius: 14px; transition: all 0.2s ease; }
-        .glass-card:hover { transform: translateY(-2px); border-color: #2d2d50; box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.1); }
-        
-        /* Agent Colors System */
-        .col-orange-icon { background: linear-gradient(135deg, #f97316, #ea580c); -webkit-background-clip: text; color: transparent; }
-        .col-orange-bar { border-bottom: 3px solid #f97316; }
-        .col-orange-tag { background: rgba(249, 115, 22, 0.1); color: #f97316; }
-        .col-orange-bg { background: linear-gradient(135deg, #f97316, #ea580c); }
+        /* Glassmorphism & Cards */
+        .glass-card {
+            background: rgba(17, 17, 24, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid #1a1a2e;
+            border-radius: 14px;
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            border-color: #2d2d50;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+        }
 
-        .col-purple-icon { background: linear-gradient(135deg, #8b5cf6, #6d28d9); -webkit-background-clip: text; color: transparent; }
-        .col-purple-bar { border-bottom: 3px solid #8b5cf6; }
-        .col-purple-tag { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
-        .col-purple-bg { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+        /* Color Systems */
+        .col-orange-icon { background: linear-gradient(135deg, #fdba74, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .col-orange-bar { border-top: 3px solid #f97316; }
+        .col-orange-bar-bottom { border-bottom: 3px solid #f97316; }
+        .col-orange-tag { background: rgba(249, 115, 22, 0.1); color: #fdba74; border: 1px solid rgba(249, 115, 22, 0.2); }
 
-        .col-blue-icon { background: linear-gradient(135deg, #3b82f6, #1d4ed8); -webkit-background-clip: text; color: transparent; }
-        .col-blue-bar { border-bottom: 3px solid #3b82f6; }
-        .col-blue-tag { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-        .col-blue-bg { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .col-purple-icon { background: linear-gradient(135deg, #c4b5fd, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .col-purple-bar { border-top: 3px solid #8b5cf6; }
+        .col-purple-bar-bottom { border-bottom: 3px solid #8b5cf6; }
+        .col-purple-tag { background: rgba(139, 92, 246, 0.1); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.2); }
 
-        .col-green-icon { background: linear-gradient(135deg, #22c55e, #15803d); -webkit-background-clip: text; color: transparent; }
-        .col-green-bar { border-bottom: 3px solid #22c55e; }
-        .col-green-tag { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
-        .col-green-bg { background: linear-gradient(135deg, #22c55e, #15803d); }
+        .col-blue-icon { background: linear-gradient(135deg, #93c5fd, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .col-blue-bar { border-top: 3px solid #3b82f6; }
+        .col-blue-bar-bottom { border-bottom: 3px solid #3b82f6; }
+        .col-blue-tag { background: rgba(59, 130, 246, 0.1); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.2); }
 
-        .col-pink-icon { background: linear-gradient(135deg, #ec4899, #be185d); -webkit-background-clip: text; color: transparent; }
-        .col-pink-bar { border-bottom: 3px solid #ec4899; }
-        .col-pink-tag { background: rgba(236, 72, 153, 0.1); color: #ec4899; }
-        .col-pink-bg { background: linear-gradient(135deg, #ec4899, #be185d); }
+        .col-green-icon { background: linear-gradient(135deg, #86efac, #22c55e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .col-green-bar { border-top: 3px solid #22c55e; }
+        .col-green-bar-bottom { border-bottom: 3px solid #22c55e; }
+        .col-green-tag { background: rgba(34, 197, 94, 0.1); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.2); }
 
-        .col-yellow-icon { background: linear-gradient(135deg, #eab308, #a16207); -webkit-background-clip: text; color: transparent; }
-        .col-yellow-bar { border-bottom: 3px solid #eab308; }
-        .col-yellow-tag { background: rgba(234, 179, 8, 0.1); color: #eab308; }
-        .col-yellow-bg { background: linear-gradient(135deg, #eab308, #a16207); }
+        .col-pink-icon { background: linear-gradient(135deg, #f9a8d4, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .col-pink-bar { border-top: 3px solid #ec4899; }
+        .col-pink-bar-bottom { border-bottom: 3px solid #ec4899; }
+        .col-pink-tag { background: rgba(236, 72, 153, 0.1); color: #f9a8d4; border: 1px solid rgba(236, 72, 153, 0.2); }
 
-        /* System Tags */
-        .tag-tube { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
-        .tag-shorts { background: rgba(6, 182, 212, 0.1); color: #06b6d4; }
-        .tag-ambos { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+        .col-yellow-icon { background: linear-gradient(135deg, #fde047, #eab308); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .col-yellow-bar { border-top: 3px solid #eab308; }
+        .col-yellow-bar-bottom { border-bottom: 3px solid #eab308; }
+        .col-yellow-tag { background: rgba(234, 179, 8, 0.1); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.2); }
+
+        /* General Tags */
+        .tag-tube { background: rgba(239, 68, 68, 0.1); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .tag-shorts { background: rgba(6, 182, 212, 0.1); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.2); }
+        .tag-ambos { background: rgba(139, 92, 246, 0.1); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.2); }
 
         /* Animations */
-        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
-        .dot-active { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; }
-        .dot-paused { width: 8px; height: 8px; background-color: #6b7280; border-radius: 50%; }
+        @keyframes pulse-dot { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
+        .dot-active { border-radius: 50%; background: #22c55e; animation: pulse-dot 2s infinite; }
+        .dot-paused { border-radius: 50%; background: #6b7280; }
 
-        @keyframes typing { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
-        .typing-dot { width: 4px; height: 4px; background: #a78bfa; border-radius: 50%; display: inline-block; animation: typing 1s infinite; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.3s ease forwards; }
+        
+        @keyframes typing { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        .typing-dot { animation: typing 1s infinite; }
         .typing-dot:nth-child(2) { animation-delay: 0.2s; }
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
-        .section-hidden { display: none !important; }
+        /* Modals */
+        .modal-overlay { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px); }
+        .modal-content { background: #0a0a0f; border: 1px solid #1a1a2e; }
+
+        /* Kanban */
+        .kanban-col { min-height: 400px; }
+        .task-card { cursor: grab; }
+        .task-card:active { cursor: grabbing; }
+        .task-card.dragging { opacity: 0.5; transform: scale(0.95); }
+
+        /* Inputs */
+        input, select, textarea { background: #111118; border: 1px solid #1a1a2e; color: white; transition: all 0.2s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
+
+        /* Buttons */
+        .btn-primary { background: linear-gradient(135deg, #8b5cf6, #6366f1); transition: all 0.2s; }
+        .btn-primary:hover { box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); transform: translateY(-1px); }
         
-        /* Drag & Drop */
-        .kanban-col { min-height: 200px; }
-        .kanban-col.drag-over { background: rgba(255, 255, 255, 0.05); border-radius: 14px; }
+        /* Nav Item */
+        .nav-item { transition: all 0.2s; border-left: 2px solid transparent; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); }
+        .nav-item.active { background: rgba(99, 102, 241, 0.1); border-left-color: #6366f1; color: white; }
+
+        .hidden-section { display: none; }
         
-        .toast { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateY(100%); opacity: 0; }
-        .toast.show { transform: translateY(0); opacity: 1; }
+        /* Drag & Drop Upload */
+        .drop-zone { border: 2px dashed #2d2d50; transition: all 0.3s; }
+        .drop-zone.dragover { border-color: #6366f1; background: rgba(99, 102, 241, 0.05); }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden text-sm">
 
     <!-- Mobile Overlay -->
-    <div id="mobileOverlay" class="fixed inset-0 bg-black/80 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/80 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
 
     <!-- SIDEBAR -->
-    <aside id="sidebar" class="w-[240px] bg-[#060609] border-r border-[#1a1a2e] flex flex-col fixed inset-y-0 left-0 z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300">
+    <aside id="sidebar" class="w-64 bg-sidebar border-r border-border flex flex-col fixed md:relative h-full z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
         <!-- Logo -->
-        <div class="h-16 flex items-center px-6 border-b border-[#1a1a2e]">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center font-bold text-lg shadow-lg shadow-purple-500/20 mr-3">Z</div>
-            <span class="font-bold text-lg tracking-wide">Zenvio<span class="bg-gradient-to-r from-purple-400 to-blue-400 -webkit-background-clip-text text-transparent bg-clip-text">GQ</span></span>
-            <button class="ml-auto lg:hidden text-gray-400" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        <div class="h-16 flex items-center px-6 border-b border-border">
+            <div class="w-8 h-8 rounded bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center font-bold text-lg mr-3 shadow-lg">Z</div>
+            <h1 class="font-bold text-lg tracking-wide">Zenvio<span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">GQ</span></h1>
         </div>
 
-        <!-- Nav -->
-        <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-8">
-            <!-- PRINCIPAL -->
-            <div>
-                <p class="px-3 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Principal</p>
-                <a href="#" onclick="navigate('dashboard')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group mb-1">
-                    <i class="fas fa-chart-pie w-6 text-center group-hover:text-purple-400 transition-colors"></i> Dashboard
-                </a>
-                <a href="#" onclick="navigate('agentes')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group mb-1">
-                    <i class="fas fa-robot w-6 text-center group-hover:text-blue-400 transition-colors"></i> Agentes
-                    <span id="nav-agent-count" class="ml-auto bg-purple-500/20 text-purple-400 text-[10px] px-2 py-0.5 rounded-full">0</span>
-                </a>
-                <a href="#" onclick="navigate('produccion')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
-                    <i class="fas fa-layer-group w-6 text-center group-hover:text-green-400 transition-colors"></i> Producción
-                </a>
-            </div>
+        <!-- Navigation -->
+        <div class="flex-1 overflow-y-auto py-4 scrollbar-hide">
+            <div class="px-4 mb-2 text-xs font-semibold text-textMuted tracking-wider">PRINCIPAL</div>
+            <a href="#" onclick="nav('dashboard')" id="nav-dashboard" class="nav-item active flex items-center px-6 py-2.5 text-textSecondary mb-1">
+                <i class="fas fa-home w-6"></i> Dashboard
+            </a>
+            <a href="#" onclick="nav('agentes')" id="nav-agentes" class="nav-item flex items-center px-6 py-2.5 text-textSecondary mb-1">
+                <i class="fas fa-robot w-6"></i> Agentes
+                <span id="badge-agentes" class="ml-auto bg-card border border-border text-xs py-0.5 px-2 rounded-full">0</span>
+            </a>
+            <a href="#" onclick="nav('produccion')" id="nav-produccion" class="nav-item flex items-center px-6 py-2.5 text-textSecondary mb-4">
+                <i class="fas fa-layer-group w-6"></i> Producción
+            </a>
 
-            <!-- INTELIGENCIA -->
-            <div>
-                <p class="px-3 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Inteligencia</p>
-                <a href="#" onclick="navigate('director')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group mb-1 bg-gradient-to-r hover:from-purple-900/20 hover:to-transparent border-l-2 border-transparent hover:border-purple-500">
-                    <i class="fas fa-crown w-6 text-center text-yellow-500"></i> Director General
-                </a>
-                <a href="#" onclick="navigate('documentos')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
-                    <i class="fas fa-file-pdf w-6 text-center group-hover:text-red-400 transition-colors"></i> Documentos
-                    <span id="nav-doc-count" class="ml-auto bg-gray-800 text-gray-300 text-[10px] px-2 py-0.5 rounded-full">0</span>
-                </a>
-            </div>
+            <div class="px-4 mb-2 text-xs font-semibold text-textMuted tracking-wider">INTELIGENCIA</div>
+            <a href="#" onclick="nav('director')" id="nav-director" class="nav-item flex items-center px-6 py-2.5 text-textSecondary mb-1 relative overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <i class="fas fa-crown w-6 text-purple-400"></i> <span class="text-purple-100 font-medium">Director General</span>
+            </a>
+            <a href="#" onclick="nav('documentos')" id="nav-documentos" class="nav-item flex items-center px-6 py-2.5 text-textSecondary mb-4">
+                <i class="fas fa-file-pdf w-6"></i> Documentos
+                <span id="badge-docs" class="ml-auto bg-card border border-border text-xs py-0.5 px-2 rounded-full">0</span>
+            </a>
 
-            <!-- CANALES -->
-            <div>
-                <p class="px-3 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Canales</p>
-                <a href="#" onclick="navigate('tube')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group mb-1">
-                    <i class="fas fa-play-circle w-6 text-center group-hover:text-red-500 transition-colors"></i> Tube Automate
-                </a>
-                <a href="#" onclick="navigate('shorts')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
-                    <i class="fas fa-bolt w-6 text-center group-hover:text-cyan-400 transition-colors"></i> Shorts System
-                </a>
-            </div>
+            <div class="px-4 mb-2 text-xs font-semibold text-textMuted tracking-wider">CANALES</div>
+            <a href="#" onclick="nav('tube-automate')" id="nav-tube-automate" class="nav-item flex items-center px-6 py-2.5 text-textSecondary mb-1">
+                <i class="fab fa-youtube w-6 text-red-500"></i> Tube Automate
+            </a>
+            <a href="#" onclick="nav('shorts-system')" id="nav-shorts-system" class="nav-item flex items-center px-6 py-2.5 text-textSecondary mb-4">
+                <i class="fas fa-bolt w-6 text-cyan-400"></i> Shorts System
+            </a>
 
-            <!-- ANALÍTICA -->
-            <div>
-                <p class="px-3 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Analítica</p>
-                <a href="#" onclick="navigate('studio')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group mb-1">
-                    <i class="fas fa-chart-line w-6 text-center group-hover:text-green-500 transition-colors"></i> YouTube Studio
-                </a>
-                <a href="#" onclick="navigate('ingresos')" class="nav-link flex items-center px-3 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors group">
-                    <i class="fas fa-dollar-sign w-6 text-center group-hover:text-emerald-400 transition-colors"></i> Ingresos
-                </a>
-            </div>
-        </nav>
+            <div class="px-4 mb-2 text-xs font-semibold text-textMuted tracking-wider">ANALÍTICA</div>
+            <a href="#" onclick="nav('studio')" id="nav-studio" class="nav-item flex items-center px-6 py-2.5 text-textSecondary mb-1">
+                <i class="fas fa-chart-line w-6"></i> YouTube Studio
+            </a>
+            <a href="#" onclick="nav('ingresos')" id="nav-ingresos" class="nav-item flex items-center px-6 py-2.5 text-textSecondary mb-1">
+                <i class="fas fa-dollar-sign w-6 text-green-400"></i> Ingresos
+            </a>
+        </div>
 
         <!-- Footer -->
-        <div class="p-4 border-t border-[#1a1a2e] bg-black/20">
+        <div class="p-4 border-t border-border">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
-                    <i class="fas fa-user text-gray-400 text-xs"></i>
+                <div class="w-8 h-8 rounded-full bg-card border border-border flex items-center justify-center">
+                    <i class="fas fa-user text-textMuted"></i>
                 </div>
                 <div>
-                    <p class="text-xs font-medium text-white">Administrador</p>
-                    <p class="text-[10px] text-gray-500">Operator → Manager</p>
+                    <div class="text-xs text-textMuted">Rol actual</div>
+                    <div class="text-xs font-semibold">Operator &rarr; Manager</div>
                 </div>
             </div>
         </div>
     </aside>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-1 flex flex-col lg:ml-[240px] h-screen bg-[#000000]">
-        
-        <!-- TOPBAR -->
-        <header class="h-16 border-b border-[#1a1a2e] bg-[#000000]/80 backdrop-blur-md flex items-center justify-between px-6 z-30 sticky top-0">
+    <main class="flex-1 flex flex-col h-screen relative bg-dark">
+        <!-- Topbar -->
+        <header class="h-16 bg-sidebar/80 backdrop-blur-md border-b border-border flex items-center justify-between px-6 sticky top-0 z-30">
             <div class="flex items-center gap-4">
-                <button class="lg:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()">
+                <button class="md:hidden text-textSecondary hover:text-white" onclick="toggleSidebar()">
                     <i class="fas fa-bars text-lg"></i>
                 </button>
-                <h1 id="topbar-title" class="text-lg font-semibold tracking-wide">Dashboard</h1>
-                <div class="hidden sm:flex items-center gap-2 bg-[#111118] border border-[#1a1a2e] px-3 py-1.5 rounded-full">
-                    <div class="dot-active"></div>
-                    <span class="text-xs text-gray-300 font-medium">Sistema Activo</span>
+                <h2 id="topbar-title" class="text-lg font-semibold capitalize">Dashboard</h2>
+                <div class="hidden sm:flex items-center gap-2 bg-green-500/10 border border-green-500/20 px-3 py-1 rounded-full text-xs text-green-400">
+                    <div class="w-2 h-2 dot-active"></div> Sistema Activo
                 </div>
             </div>
 
-            <div class="flex items-center gap-6">
-                <!-- Counters -->
-                <div class="hidden md:flex gap-4 text-xs font-medium">
-                    <div class="flex flex-col items-end"><span class="text-gray-500 text-[10px] uppercase">Activos</span><span id="top-count-agents" class="text-purple-400">0</span></div>
-                    <div class="flex flex-col items-end"><span class="text-gray-500 text-[10px] uppercase">Pendientes</span><span id="top-count-pending" class="text-orange-400">0</span></div>
-                    <div class="flex flex-col items-end"><span class="text-gray-500 text-[10px] uppercase">En Proceso</span><span id="top-count-process" class="text-blue-400">0</span></div>
-                    <div class="flex flex-col items-end"><span class="text-gray-500 text-[10px] uppercase">Completadas</span><span id="top-count-done" class="text-green-400">0</span></div>
+            <div class="flex items-center gap-4">
+                <div class="hidden lg:flex items-center gap-4 mr-4 text-xs">
+                    <div class="text-center"><div class="text-textMuted">Pendientes</div><div id="top-pend" class="font-bold text-orange-400">0</div></div>
+                    <div class="text-center"><div class="text-textMuted">Proceso</div><div id="top-proc" class="font-bold text-blue-400">0</div></div>
+                    <div class="text-center"><div class="text-textMuted">Hecho</div><div id="top-done" class="font-bold text-green-400">0</div></div>
                 </div>
-                
-                <!-- Action Button -->
-                <button id="topbar-action-btn" onclick="handleTopbarAction()" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow-lg shadow-purple-500/20 transition-all hidden">
-                    <i class="fas fa-plus mr-1"></i> <span id="topbar-action-text">Nuevo</span>
+                <button id="btn-context" onclick="openContextModal()" class="btn-primary px-4 py-2 rounded-lg text-white font-medium text-xs hidden shadow-lg shadow-primary/20">
+                    <i class="fas fa-plus mr-1"></i> <span id="btn-context-text">Acción</span>
                 </button>
             </div>
         </header>
 
-        <!-- SCROLLABLE CONTENT AREA -->
-        <div id="content-area" class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
+        <!-- Scrollable Area -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-6 pb-24" id="main-scroll">
             
+            <!-- TOAST CONTAINER -->
+            <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+
             <!-- SECTION: DASHBOARD -->
-            <section id="sec-dashboard" class="space-y-8">
-                <!-- Stat Cards -->
+            <section id="sec-dashboard" class="space-y-6">
+                <!-- Stats -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="glass-card p-5 border-t-2 border-t-purple-500 relative overflow-hidden group">
-                        <div class="absolute -right-6 -top-6 text-purple-500/10 group-hover:text-purple-500/20 transition-colors"><i class="fas fa-robot text-7xl"></i></div>
-                        <p class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Agentes Activos</p>
-                        <h3 id="stat-agents" class="text-3xl font-black text-white">0</h3>
-                        <p class="text-xs text-gray-500 mt-2">En el sistema ZenvioGQ</p>
+                    <div class="glass-card p-5 col-purple-bar relative overflow-hidden">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="text-xs text-textMuted font-semibold mb-1 uppercase tracking-wider">Agentes Activos</div>
+                                <div class="text-3xl font-bold" id="dash-agents">0</div>
+                            </div>
+                            <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400"><i class="fas fa-robot text-xl"></i></div>
+                        </div>
+                        <div class="text-xs text-textDim mt-2">En el sistema</div>
                     </div>
-                    <div class="glass-card p-5 border-t-2 border-t-orange-500 relative overflow-hidden group">
-                        <div class="absolute -right-6 -top-6 text-orange-500/10 group-hover:text-orange-500/20 transition-colors"><i class="fas fa-clock text-7xl"></i></div>
-                        <p class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Pendientes</p>
-                        <h3 id="stat-pending" class="text-3xl font-black text-white">0</h3>
-                        <p class="text-xs text-gray-500 mt-2">Esperando ejecución</p>
+                    <div class="glass-card p-5 col-orange-bar relative overflow-hidden">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="text-xs text-textMuted font-semibold mb-1 uppercase tracking-wider">Tareas Pendientes</div>
+                                <div class="text-3xl font-bold text-orange-400" id="dash-pend">0</div>
+                            </div>
+                            <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400"><i class="fas fa-inbox text-xl"></i></div>
+                        </div>
+                        <div class="text-xs text-textDim mt-2">Por iniciar</div>
                     </div>
-                    <div class="glass-card p-5 border-t-2 border-t-blue-500 relative overflow-hidden group">
-                        <div class="absolute -right-6 -top-6 text-blue-500/10 group-hover:text-blue-500/20 transition-colors"><i class="fas fa-spinner text-7xl"></i></div>
-                        <p class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">En Proceso</p>
-                        <h3 id="stat-process" class="text-3xl font-black text-white">0</h3>
-                        <p class="text-xs text-gray-500 mt-2">Trabajando ahora</p>
+                    <div class="glass-card p-5 col-blue-bar relative overflow-hidden">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="text-xs text-textMuted font-semibold mb-1 uppercase tracking-wider">En Proceso</div>
+                                <div class="text-3xl font-bold text-blue-400" id="dash-proc">0</div>
+                            </div>
+                            <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400"><i class="fas fa-spinner text-xl"></i></div>
+                        </div>
+                        <div class="text-xs text-textDim mt-2">Trabajando ahora</div>
                     </div>
-                    <div class="glass-card p-5 border-t-2 border-t-green-500 relative overflow-hidden group">
-                        <div class="absolute -right-6 -top-6 text-green-500/10 group-hover:text-green-500/20 transition-colors"><i class="fas fa-check-circle text-7xl"></i></div>
-                        <p class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Completadas</p>
-                        <h3 id="stat-done" class="text-3xl font-black text-white">0</h3>
-                        <p class="text-xs text-gray-500 mt-2">Tareas finalizadas</p>
+                    <div class="glass-card p-5 col-green-bar relative overflow-hidden">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="text-xs text-textMuted font-semibold mb-1 uppercase tracking-wider">Completadas</div>
+                                <div class="text-3xl font-bold text-green-400" id="dash-done">0</div>
+                            </div>
+                            <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center text-green-400"><i class="fas fa-check-circle text-xl"></i></div>
+                        </div>
+                        <div class="text-xs text-textDim mt-2">Total histórico</div>
                     </div>
                 </div>
 
                 <!-- Resumen Agentes -->
                 <div>
-                    <h2 class="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2"><i class="fas fa-users text-purple-500"></i> Escuadrón Activo</h2>
-                    <div id="dash-agents-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                        <!-- Filled by JS -->
-                    </div>
-                </div>
-
-                <!-- Resumen Kanban -->
-                <div>
-                    <h2 class="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2"><i class="fas fa-stream text-blue-500"></i> Flujo de Trabajo</h2>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                        <div class="glass-card p-4 border-t-2 border-t-orange-500">
-                            <h3 class="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">Pendientes</h3>
-                            <div id="dash-col-pending" class="space-y-2"></div>
-                        </div>
-                        <div class="glass-card p-4 border-t-2 border-t-blue-500">
-                            <h3 class="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">En Proceso</h3>
-                            <div id="dash-col-process" class="space-y-2"></div>
-                        </div>
-                        <div class="glass-card p-4 border-t-2 border-t-green-500">
-                            <h3 class="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">Completadas</h3>
-                            <div id="dash-col-done" class="space-y-2"></div>
-                        </div>
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2"><i class="fas fa-users text-primary"></i> Equipo IA</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="grid-dashboard-agents">
+                        <!-- Render via JS -->
                     </div>
                 </div>
             </section>
 
             <!-- SECTION: AGENTES -->
-            <section id="sec-agentes" class="section-hidden">
-                <div id="agents-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    <!-- Filled by JS -->
+            <section id="sec-agentes" class="hidden-section space-y-6">
+                <div class="flex justify-between items-center mb-4">
+                    <p class="text-textMuted">Gestiona tu equipo de IA para automatización.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="grid-agents">
+                    <!-- Render via JS -->
                 </div>
             </section>
 
             <!-- SECTION: PRODUCCION (KANBAN) -->
-            <section id="sec-produccion" class="section-hidden h-full">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full pb-10">
-                    <!-- Pending -->
-                    <div class="flex flex-col h-full">
-                        <div class="flex items-center justify-between mb-3 px-1">
-                            <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-orange-500"></div><h3 class="font-semibold">Pendientes</h3></div>
-                            <span id="kb-count-pending" class="bg-orange-500/10 text-orange-500 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+            <section id="sec-produccion" class="hidden-section h-full flex flex-col">
+                <p class="text-textMuted mb-4">Arrastra las tareas para cambiar su estado.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 min-h-0">
+                    <!-- Column: Pending -->
+                    <div class="glass-card bg-card/50 flex flex-col h-full rounded-xl border border-border">
+                        <div class="p-4 border-b border-border flex items-center justify-between col-orange-bar bg-card rounded-t-xl">
+                            <h3 class="font-bold flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-orange-500"></div> Pendientes</h3>
+                            <span class="bg-dark px-2 py-0.5 rounded text-xs text-orange-400 border border-border" id="kb-count-pend">0</span>
                         </div>
-                        <div id="kb-pending" class="kanban-col flex-1 bg-[#0a0a0f] border border-[#1a1a2e] rounded-xl p-3 space-y-3 overflow-y-auto" ondragover="allowDrop(event)" ondrop="drop(event, 'pending')"></div>
+                        <div class="p-3 flex-1 overflow-y-auto space-y-3 kanban-col" id="col-pending" ondragover="allowDrop(event)" ondrop="drop(event, 'pending')">
+                            <!-- Tasks -->
+                        </div>
                     </div>
-                    <!-- Process -->
-                    <div class="flex flex-col h-full">
-                        <div class="flex items-center justify-between mb-3 px-1">
-                            <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-blue-500"></div><h3 class="font-semibold">En Proceso</h3></div>
-                            <span id="kb-count-process" class="bg-blue-500/10 text-blue-500 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                    <!-- Column: Process -->
+                    <div class="glass-card bg-card/50 flex flex-col h-full rounded-xl border border-border">
+                        <div class="p-4 border-b border-border flex items-center justify-between col-blue-bar bg-card rounded-t-xl">
+                            <h3 class="font-bold flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-blue-500"></div> En Proceso</h3>
+                            <span class="bg-dark px-2 py-0.5 rounded text-xs text-blue-400 border border-border" id="kb-count-proc">0</span>
                         </div>
-                        <div id="kb-process" class="kanban-col flex-1 bg-[#0a0a0f] border border-[#1a1a2e] rounded-xl p-3 space-y-3 overflow-y-auto" ondragover="allowDrop(event)" ondrop="drop(event, 'process')"></div>
+                        <div class="p-3 flex-1 overflow-y-auto space-y-3 kanban-col" id="col-process" ondragover="allowDrop(event)" ondrop="drop(event, 'process')">
+                            <!-- Tasks -->
+                        </div>
                     </div>
-                    <!-- Done -->
-                    <div class="flex flex-col h-full">
-                        <div class="flex items-center justify-between mb-3 px-1">
-                            <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-green-500"></div><h3 class="font-semibold">Completadas</h3></div>
-                            <span id="kb-count-done" class="bg-green-500/10 text-green-500 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                    <!-- Column: Done -->
+                    <div class="glass-card bg-card/50 flex flex-col h-full rounded-xl border border-border">
+                        <div class="p-4 border-b border-border flex items-center justify-between col-green-bar bg-card rounded-t-xl">
+                            <h3 class="font-bold flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-green-500"></div> Completadas</h3>
+                            <span class="bg-dark px-2 py-0.5 rounded text-xs text-green-400 border border-border" id="kb-count-done">0</span>
                         </div>
-                        <div id="kb-done" class="kanban-col flex-1 bg-[#0a0a0f] border border-[#1a1a2e] rounded-xl p-3 space-y-3 overflow-y-auto" ondragover="allowDrop(event)" ondrop="drop(event, 'done')"></div>
+                        <div class="p-3 flex-1 overflow-y-auto space-y-3 kanban-col" id="col-done" ondragover="allowDrop(event)" ondrop="drop(event, 'done')">
+                            <!-- Tasks -->
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- SECTION: DIRECTOR GENERAL -->
-            <section id="sec-director" class="section-hidden max-w-5xl mx-auto h-[calc(100vh-120px)] flex flex-col">
+            <!-- SECTION: DIRECTOR GENERAL (CHAT IA) -->
+            <section id="sec-director" class="hidden-section max-w-4xl mx-auto flex flex-col h-[calc(100vh-100px)] relative">
                 
-                <!-- Chat Header & Config -->
-                <div class="glass-card p-4 mb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <!-- Chat Header -->
+                <div class="glass-card p-4 flex flex-wrap items-center justify-between gap-4 mb-4 z-10 relative">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 p-0.5">
-                            <div class="w-full h-full bg-black rounded-full flex items-center justify-center text-xl">👑</div>
-                        </div>
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-2xl shadow-lg border-2 border-border">👑</div>
                         <div>
-                            <h2 class="font-bold text-lg flex items-center gap-2">Director General <span class="bg-green-500/20 text-green-400 text-[10px] px-2 py-0.5 rounded-full border border-green-500/30">Online</span></h2>
-                            <p class="text-xs text-gray-400">Orquestador principal IA de ZenvioGQ</p>
+                            <h3 class="font-bold text-lg text-purple-100 flex items-center gap-2">Director General <div class="w-2 h-2 dot-active"></div></h3>
+                            <p class="text-xs text-purple-300">Gestor IA de tu ecosistema YouTube</p>
                         </div>
                     </div>
-                    <div class="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto">
-                        <input type="text" id="n8n-webhook-url" placeholder="URL Webhook n8n" value="http://localhost:5678/webhook/director-general" class="w-full sm:w-64 bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-purple-500">
-                        <div class="flex gap-2 w-full sm:w-auto">
-                            <button onclick="testWebhook()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg text-xs transition-colors border border-gray-700"><i class="fas fa-plug text-blue-400 mr-1"></i> Probar</button>
-                            <button onclick="navigate('documentos')" class="flex-1 bg-gray-800 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg text-xs transition-colors border border-gray-700"><i class="fas fa-file-pdf text-red-400 mr-1"></i> Contexto</button>
-                        </div>
+                    <div class="flex-1 w-full md:w-auto md:max-w-xs flex gap-2">
+                        <input type="text" id="webhook-url" class="w-full px-3 py-1.5 rounded-lg text-xs" placeholder="URL Webhook n8n" value="http://localhost:5678/webhook/director-general">
+                        <button onclick="testWebhook()" class="bg-card border border-border hover:bg-border px-3 py-1.5 rounded-lg text-xs transition">Probar</button>
                     </div>
                 </div>
 
-                <!-- Suggestions -->
+                <!-- Chips Sugerencias -->
                 <div class="flex flex-wrap gap-2 mb-4">
-                    <button onclick="sendSuggestion('¿Cuál es mi primer paso para automatizar?')" class="bg-[#111118] border border-[#1a1a2e] hover:border-purple-500 hover:bg-purple-500/10 text-xs px-3 py-1.5 rounded-full text-gray-300 transition-colors">🚀 Primer paso</button>
-                    <button onclick="sendSuggestion('Dame 5 ideas virales para Shorts de tecnología')" class="bg-[#111118] border border-[#1a1a2e] hover:border-purple-500 hover:bg-purple-500/10 text-xs px-3 py-1.5 rounded-full text-gray-300 transition-colors">⚡ Ideas Shorts</button>
-                    <button onclick="sendSuggestion('Crea las tareas iniciales para un video de 10 min')" class="bg-[#111118] border border-[#1a1a2e] hover:border-purple-500 hover:bg-purple-500/10 text-xs px-3 py-1.5 rounded-full text-gray-300 transition-colors">📋 Crear tareas</button>
-                    <button onclick="sendSuggestion('Resúmeme los documentos subidos')" class="bg-[#111118] border border-[#1a1a2e] hover:border-purple-500 hover:bg-purple-500/10 text-xs px-3 py-1.5 rounded-full text-gray-300 transition-colors">📚 Resumir PDF</button>
-                    <button onclick="sendSuggestion('Dame la fórmula para títulos virales')" class="bg-[#111118] border border-[#1a1a2e] hover:border-purple-500 hover:bg-purple-500/10 text-xs px-3 py-1.5 rounded-full text-gray-300 transition-colors">🎯 Títulos</button>
+                    <button class="bg-card border border-border hover:border-purple-500 px-3 py-1.5 rounded-full text-xs text-textSecondary transition" onclick="fillChat('¿Cuál es mi primer paso?')">¿Cuál es mi primer paso?</button>
+                    <button class="bg-card border border-border hover:border-purple-500 px-3 py-1.5 rounded-full text-xs text-textSecondary transition" onclick="fillChat('Dame 5 ideas virales')">Dame 5 ideas virales</button>
+                    <button class="bg-card border border-border hover:border-purple-500 px-3 py-1.5 rounded-full text-xs text-textSecondary transition" onclick="fillChat('Crea las tareas iniciales')">Crea las tareas iniciales</button>
+                    <button class="bg-card border border-border hover:border-purple-500 px-3 py-1.5 rounded-full text-xs text-textSecondary transition" onclick="fillChat('Resúmeme los documentos')">Resúmeme los documentos</button>
                 </div>
 
-                <!-- Messages Area -->
-                <div id="chat-messages" class="flex-1 bg-[#0a0a0f] border border-[#1a1a2e] rounded-xl p-4 overflow-y-auto space-y-4 mb-4">
-                    <!-- Welcome Msg -->
-                    <div class="flex justify-start">
-                        <div class="max-w-[85%] sm:max-w-[75%] bg-[#111118] border border-[#1a1a2e] rounded-2xl rounded-tl-sm p-4 shadow-lg shadow-black/50 relative">
-                            <span class="absolute -top-2.5 left-4 bg-yellow-500/20 border border-yellow-500/50 text-yellow-500 text-[9px] font-bold px-2 py-0.5 rounded-full">👑 Director</span>
-                            <p class="text-sm text-gray-200 mt-1">Saludos. Soy tu Director General. Estoy conectado a Supabase y tengo acceso a tus documentos. Puedo crear agentes y tareas automáticamente si me lo pides. ¿En qué trabajamos hoy?</p>
+                <!-- Chat Messages Area -->
+                <div id="chat-box" class="flex-1 overflow-y-auto bg-dark border border-border rounded-xl p-4 space-y-4 mb-4 shadow-inner">
+                    <!-- Mensaje Inicial -->
+                    <div class="flex gap-3 max-w-[85%]">
+                        <div class="w-8 h-8 rounded-full bg-card border border-border flex-shrink-0 flex items-center justify-center">👑</div>
+                        <div class="bg-card border border-border p-3 rounded-2xl rounded-tl-sm text-sm text-textSecondary">
+                            <p>Saludos. Soy tu Director General. Estoy conectado a tus agentes, tareas y base de conocimiento. ¿En qué estrategia trabajamos hoy?</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Input Area -->
+                <!-- Chat Input -->
                 <div class="glass-card p-2 flex items-center gap-2">
-                    <input type="text" id="chat-input" placeholder="Escribe un mensaje al Director General... (Ej: Crea una tarea para editar el video)" class="flex-1 bg-transparent text-white px-4 py-3 focus:outline-none text-sm placeholder-gray-600" onkeypress="handleChatKeypress(event)">
-                    <button onclick="sendChatMessage()" class="w-10 h-10 rounded-lg bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center transition-colors shadow-lg shadow-purple-500/20"><i class="fas fa-paper-plane"></i></button>
+                    <button onclick="nav('documentos')" class="p-2 md:px-4 text-textMuted hover:text-purple-400 transition flex items-center gap-2" title="Subir Conocimiento">
+                        <i class="fas fa-file-pdf"></i> <span class="hidden md:inline text-xs">Añadir PDF</span>
+                    </button>
+                    <input type="text" id="chat-input" class="flex-1 bg-dark border border-border rounded-lg px-4 py-3 text-sm focus:border-purple-500" placeholder="Escribe tu comando o pregunta... (Ej: Crea una tarea para el guionista)" onkeypress="if(event.key === 'Enter') sendChatMessage()">
+                    <button onclick="sendChatMessage()" class="btn-primary w-10 h-10 md:w-auto md:px-6 rounded-lg flex items-center justify-center gap-2 shadow-lg">
+                        <i class="fas fa-paper-plane"></i> <span class="hidden md:inline font-medium">Enviar</span>
+                    </button>
                 </div>
             </section>
 
             <!-- SECTION: DOCUMENTOS -->
-            <section id="sec-documentos" class="section-hidden max-w-5xl mx-auto">
+            <section id="sec-documentos" class="hidden-section max-w-5xl mx-auto space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="md:col-span-2 space-y-6">
-                        <!-- Dropzone -->
-                        <div id="dropzone" class="border-2 border-dashed border-[#2d2d50] rounded-2xl bg-[#0a0a0f] hover:bg-[#111118] hover:border-purple-500 transition-all p-10 flex flex-col items-center justify-center text-center cursor-pointer relative" onclick="document.getElementById('pdf-upload').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-                            <input type="file" id="pdf-upload" accept="application/pdf" class="hidden" onchange="handleFileSelect(event)">
-                            <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4 text-red-500">
-                                <i class="fas fa-cloud-upload-alt text-3xl"></i>
-                            </div>
-                            <h3 class="text-lg font-bold text-white mb-2">Sube tus PDFs de Conocimiento</h3>
-                            <p class="text-sm text-gray-500 max-w-sm">Arrastra y suelta documentos aquí o haz click para buscar. El texto será extraído y usado como contexto por el Director General.</p>
-                            
-                            <!-- Progress Overlay -->
-                            <div id="upload-progress" class="absolute inset-0 bg-black/90 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center hidden">
-                                <i class="fas fa-circle-notch fa-spin text-purple-500 text-3xl mb-3"></i>
-                                <p id="upload-status-text" class="text-sm font-medium text-white">Extrayendo texto...</p>
-                            </div>
+                    <!-- Upload Panel -->
+                    <div class="md:col-span-1 space-y-4">
+                        <div class="glass-card p-6 text-center drop-zone rounded-xl" id="pdf-drop-zone" onclick="document.getElementById('pdf-file').click()" ondragover="event.preventDefault(); this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handlePdfDrop(event)">
+                            <input type="file" id="pdf-file" accept="application/pdf" class="hidden" onchange="handlePdfSelect(event)">
+                            <div class="w-16 h-16 mx-auto bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mb-4"><i class="fas fa-file-pdf text-2xl"></i></div>
+                            <h3 class="font-bold text-white mb-2">Subir Conocimiento</h3>
+                            <p class="text-xs text-textMuted mb-4">Arrastra un PDF aquí o haz click para seleccionar</p>
+                            <button class="bg-card border border-border px-4 py-2 rounded-lg text-xs hover:bg-border transition w-full">Seleccionar Archivo</button>
                         </div>
 
-                        <!-- Lista Docs -->
-                        <div class="glass-card p-5">
-                            <h3 class="text-sm font-semibold mb-4 border-b border-[#1a1a2e] pb-2">Base de Conocimiento Actual</h3>
-                            <div id="docs-list" class="space-y-3">
-                                <!-- Filled by JS -->
-                                <p class="text-center text-gray-500 py-4 text-xs italic">No hay documentos subidos</p>
-                            </div>
+                        <!-- Info Panel -->
+                        <div class="glass-card p-5 rounded-xl border-l-4 border-l-blue-500">
+                            <h4 class="font-bold text-sm mb-3 flex items-center gap-2"><i class="fas fa-info-circle text-blue-400"></i> ¿Cómo funciona?</h4>
+                            <ul class="text-xs text-textMuted space-y-2">
+                                <li class="flex gap-2"><span class="text-blue-400">1.</span> Subes un PDF con estrategias, guiones o info de tu nicho.</li>
+                                <li class="flex gap-2"><span class="text-blue-400">2.</span> El sistema extrae el texto localmente (seguro).</li>
+                                <li class="flex gap-2"><span class="text-blue-400">3.</span> Se guarda en la base de datos Supabase.</li>
+                                <li class="flex gap-2"><span class="text-blue-400">4.</span> El "Director General" lee este contexto antes de responderte.</li>
+                            </ul>
                         </div>
                     </div>
 
-                    <!-- Info Box -->
-                    <div class="glass-card p-5 h-fit border-t-2 border-t-red-500">
-                        <h3 class="font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-info-circle text-red-400"></i> ¿Cómo funciona?</h3>
-                        <ol class="space-y-4 text-xs text-gray-400">
-                            <li class="flex gap-3"><span class="w-5 h-5 rounded bg-gray-800 flex items-center justify-center text-white shrink-0">1</span>Sube un PDF (Guiones, estrategias, analíticas).</li>
-                            <li class="flex gap-3"><span class="w-5 h-5 rounded bg-gray-800 flex items-center justify-center text-white shrink-0">2</span>El sistema extrae el texto localmente en tu navegador usando <span class="text-purple-400 font-semibold">PDF.js</span>.</li>
-                            <li class="flex gap-3"><span class="w-5 h-5 rounded bg-gray-800 flex items-center justify-center text-white shrink-0">3</span>Se guarda en la base de datos de Supabase.</li>
-                            <li class="flex gap-3"><span class="w-5 h-5 rounded bg-gray-800 flex items-center justify-center text-white shrink-0">4</span>Al hablar con el Director General, este texto se envía como <span class="text-blue-400 font-semibold">contexto</span> en el Webhook.</li>
-                        </ol>
+                    <!-- List Panel -->
+                    <div class="md:col-span-2 glass-card p-0 rounded-xl overflow-hidden flex flex-col">
+                        <div class="p-4 border-b border-border bg-card flex justify-between items-center">
+                            <h3 class="font-bold">Base de Conocimiento IA</h3>
+                            <span class="text-xs text-textMuted" id="doc-count-text">0 archivos</span>
+                        </div>
+                        
+                        <!-- Upload Progress (Hidden default) -->
+                        <div id="upload-progress" class="hidden p-4 border-b border-border bg-dark">
+                            <div class="flex justify-between text-xs mb-1">
+                                <span id="upload-filename" class="text-blue-400 font-medium">Procesando...</span>
+                                <span id="upload-pct">0%</span>
+                            </div>
+                            <div class="w-full bg-card rounded-full h-1.5">
+                                <div id="upload-bar" class="bg-blue-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <p class="text-[10px] text-textDim mt-1" id="upload-status">Extrayendo texto del PDF...</p>
+                        </div>
+
+                        <!-- Documents List -->
+                        <div class="flex-1 overflow-y-auto p-2 space-y-2 max-h-[500px]" id="list-documents">
+                            <!-- Render via JS -->
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- SECTION: INFO CARDS (TUBE, SHORTS, STUDIO, INGRESOS) -->
-            <section id="sec-info" class="section-hidden">
-                <h2 id="info-title" class="text-xl font-bold mb-6 flex items-center gap-2">Título</h2>
-                <div id="info-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Injected dynamically -->
+            <!-- SECTION: TUBE AUTOMATE -->
+            <section id="sec-tube-automate" class="hidden-section space-y-6 max-w-6xl mx-auto">
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><i class="fab fa-youtube text-red-500"></i> Tube Automate Knowledge</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-card p-6 border-t-4 border-t-red-500">
+                        <h3 class="font-bold text-lg mb-4 text-white">The Trifecta (Content Strategy)</h3>
+                        <ul class="space-y-3 text-sm text-textSecondary">
+                            <li class="flex items-start gap-3"><div class="text-red-400 mt-1"><i class="fas fa-fire"></i></div><div><strong class="text-white">Trending Videos:</strong> Salto a tendencias. Views rápidas. Poca vida útil.</div></li>
+                            <li class="flex items-start gap-3"><div class="text-blue-400 mt-1"><i class="fas fa-search"></i></div><div><strong class="text-white">Search Videos:</strong> Respuestas a preguntas. Views constantes (Evergreen).</div></li>
+                            <li class="flex items-start gap-3"><div class="text-purple-400 mt-1"><i class="fas fa-star"></i></div><div><strong class="text-white">Crack Videos:</strong> Contenido único/innovador. Alto riesgo, altísima recompensa.</div></li>
+                        </ul>
+                    </div>
+                    <div class="glass-card p-6 border-t-4 border-t-purple-500">
+                        <h3 class="font-bold text-lg mb-4 text-white">The Triumvirate (Performance)</h3>
+                        <div class="space-y-4">
+                            <div class="bg-card p-3 rounded-lg border border-border"><strong class="text-white block mb-1">1. Titles</strong> <span class="text-sm text-textMuted">< 50 caracteres. Apuntar a Emotion/Mystery Value (EMV) > 40%.</span></div>
+                            <div class="bg-card p-3 rounded-lg border border-border"><strong class="text-white block mb-1">2. Thumbnails</strong> <span class="text-sm text-textMuted">Máximo 4 palabras. Colores contrastantes. Rostros expresivos.</span></div>
+                            <div class="bg-card p-3 rounded-lg border border-border"><strong class="text-white block mb-1">3. Watch Time</strong> <span class="text-sm text-textMuted">Hook en 3 segs. Pattern break cada 10-15 segs. AVD meta: >45%.</span></div>
+                        </div>
+                    </div>
+                    <div class="glass-card p-6 border-t-4 border-t-blue-500 md:col-span-2">
+                        <h3 class="font-bold text-lg mb-4 text-white">Delegation & Costs</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="text-center p-4 bg-card rounded-xl border border-border"><div class="text-2xl mb-2 text-blue-400"><i class="fas fa-pen-nib"></i></div><div class="font-bold text-white">Script</div><div class="text-sm text-textMuted">$30 - $70</div></div>
+                            <div class="text-center p-4 bg-card rounded-xl border border-border"><div class="text-2xl mb-2 text-green-400"><i class="fas fa-microphone"></i></div><div class="font-bold text-white">Voice Over</div><div class="text-sm text-textMuted">$30 - $50</div></div>
+                            <div class="text-center p-4 bg-card rounded-xl border border-border"><div class="text-2xl mb-2 text-purple-400"><i class="fas fa-cut"></i></div><div class="font-bold text-white">Editing</div><div class="text-sm text-textMuted">$50 - $100</div></div>
+                            <div class="text-center p-4 bg-card rounded-xl border border-border"><div class="text-2xl mb-2 text-orange-400"><i class="fas fa-image"></i></div><div class="font-bold text-white">Thumbnail</div><div class="text-sm text-textMuted">$20 - $40</div></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: SHORTS SYSTEM -->
+            <section id="sec-shorts-system" class="hidden-section space-y-6 max-w-6xl mx-auto">
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><i class="fas fa-bolt text-cyan-400"></i> Shorts System Knowledge</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-card p-6 border-t-4 border-t-cyan-500 md:col-span-2">
+                        <h3 class="font-bold text-lg mb-4 text-white">Viral Titles Formula</h3>
+                        <div class="bg-dark p-4 rounded-lg border border-border text-center mb-4">
+                            <span class="text-cyan-400 font-bold">The</span> + <span class="text-pink-400 font-bold">[Emotion]</span> + <span class="text-yellow-400 font-bold">[Character]</span> + <span class="text-green-400 font-bold">Ever</span> + ❤️
+                        </div>
+                        <p class="text-sm text-textMuted mb-2">Ejemplos:</p>
+                        <ul class="text-sm space-y-2 text-textSecondary">
+                            <li>- The <span class="text-pink-400">Saddest</span> <span class="text-yellow-400">Dog</span> Ever 😭</li>
+                            <li>- The <span class="text-pink-400">Smartest</span> <span class="text-yellow-400">Thief</span> Ever 🤯</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card p-6 border-t-4 border-t-pink-500">
+                        <h3 class="font-bold text-lg mb-4 text-white">Retention Curve</h3>
+                        <ul class="space-y-4 text-sm">
+                            <li><strong class="text-white block">0-3s: The Hook</strong> <span class="text-textMuted">Visual + Audio fuerte. Promesa clara.</span></li>
+                            <li><strong class="text-white block">3-45s: Fast Body</strong> <span class="text-textMuted">Cortes rápidos, subtítulos dinámicos, B-roll.</span></li>
+                            <li><strong class="text-white block">45-60s: The Reward</strong> <span class="text-textMuted">Entrega de la promesa AL FINAL para maximizar retención.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: STUDIO & INGRESOS (Combined simple views) -->
+            <section id="sec-studio" class="hidden-section space-y-6 max-w-4xl mx-auto text-center py-10">
+                <i class="fab fa-youtube text-6xl text-red-600 mb-4 drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]"></i>
+                <h2 class="text-3xl font-bold mb-2">YouTube Studio Analytics</h2>
+                <p class="text-textMuted mb-8">Conecta con tus métricas reales y aplica la Rule of Revision.</p>
+                <div class="glass-card p-6 inline-block text-left mb-8 max-w-md w-full">
+                    <h4 class="font-bold text-white mb-2">🎯 Rule of Revision</h4>
+                    <p class="text-sm text-textSecondary mb-4">Cada 10 videos publicados, analiza datos y cambia 1 cosa (títulos, ritmo, música, temática).</p>
+                    <div class="bg-dark p-3 rounded border border-border text-sm">
+                        Meta CTR a 3h: <strong class="text-green-400">&ge; 7%</strong><br>
+                        Meta AVD: <strong class="text-green-400">&ge; 40%</strong>
+                    </div>
+                </div>
+                <br>
+                <a href="https://studio.youtube.com" target="_blank" class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-xl font-bold transition shadow-lg shadow-red-600/20">
+                    Abrir YouTube Studio <i class="fas fa-external-link-alt text-xs"></i>
+                </a>
+            </section>
+
+            <section id="sec-ingresos" class="hidden-section space-y-6 max-w-5xl mx-auto">
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><i class="fas fa-dollar-sign text-green-400"></i> Monetization Roadmap</h2>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+                    <div class="glass-card p-4 text-center border-t-2 border-t-border hover:border-t-green-500">
+                        <div class="text-xl mb-1">1️⃣</div><div class="font-bold text-sm">Affiliates</div><div class="text-xs text-textMuted">0-1K Subs</div>
+                    </div>
+                    <div class="glass-card p-4 text-center border-t-2 border-t-border hover:border-t-green-500">
+                        <div class="text-xl mb-1">2️⃣</div><div class="font-bold text-sm">Ad Revenue</div><div class="text-xs text-textMuted">1K+ Subs</div>
+                    </div>
+                    <div class="glass-card p-4 text-center border-t-2 border-t-border hover:border-t-green-500">
+                        <div class="text-xl mb-1">3️⃣</div><div class="font-bold text-sm">Brand Deals</div><div class="text-xs text-textMuted">5K+ Subs</div>
+                    </div>
+                    <div class="glass-card p-4 text-center border-t-2 border-t-border hover:border-t-green-500">
+                        <div class="text-xl mb-1">4️⃣</div><div class="font-bold text-sm">Products</div><div class="text-xs text-textMuted">5K+ Subs</div>
+                    </div>
+                    <div class="glass-card p-4 text-center border-t-2 border-t-border hover:border-t-green-500">
+                        <div class="text-xl mb-1">5️⃣</div><div class="font-bold text-sm">Exclusive</div><div class="text-xs text-textMuted">Comunidad</div>
+                    </div>
+                </div>
+                <div class="glass-card p-8 bg-gradient-to-br from-card to-green-900/10 border-green-500/20 text-center">
+                    <h3 class="text-xl font-bold mb-2 text-white">Roadmap to $5,000 / mes</h3>
+                    <p class="text-textMuted mb-6">Con 100,000 views mensuales enfocadas en un buen nicho.</p>
+                    <div class="flex flex-wrap justify-center gap-4 text-lg font-bold">
+                        <span class="bg-dark px-4 py-2 rounded-lg border border-border text-green-400">$1K Ads</span> <span class="text-textMuted mt-2">+</span>
+                        <span class="bg-dark px-4 py-2 rounded-lg border border-border text-blue-400">$500 Brands</span> <span class="text-textMuted mt-2">+</span>
+                        <span class="bg-dark px-4 py-2 rounded-lg border border-border text-purple-400">$2.5K Products</span> <span class="text-textMuted mt-2">+</span>
+                        <span class="bg-dark px-4 py-2 rounded-lg border border-border text-orange-400">$1K Affiliates</span>
+                    </div>
                 </div>
             </section>
 
         </div>
     </main>
 
-    <!-- MODALS -->
-    <!-- Modal Agente -->
-    <div id="modal-agent" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center p-4">
-        <div class="bg-[#0a0a0f] border border-[#1a1a2e] rounded-2xl w-full max-w-md overflow-hidden transform transition-all shadow-2xl">
-            <div class="px-6 py-4 border-b border-[#1a1a2e] flex justify-between items-center bg-[#111118]">
-                <h3 class="font-bold text-lg" id="modal-agent-title">Crear Agente</h3>
-                <button onclick="closeModal('modal-agent')" class="text-gray-500 hover:text-white"><i class="fas fa-times"></i></button>
+    <!-- MODAL: CREAR/EDITAR AGENTE -->
+    <div id="modal-agent" class="fixed inset-0 modal-overlay flex items-center justify-center z-50 hidden opacity-0 transition-opacity">
+        <div class="modal-content w-full max-w-md rounded-2xl p-6 transform scale-95 transition-transform" id="modal-agent-content">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-lg font-bold">Nuevo Agente IA</h3>
+                <button onclick="closeModal('modal-agent')" class="text-textMuted hover:text-white"><i class="fas fa-times"></i></button>
             </div>
-            <form id="form-agent" class="p-6 space-y-4" onsubmit="saveAgent(event)">
-                <input type="hidden" id="ag-id">
-                <div><label class="block text-xs text-gray-400 mb-1">Nombre *</label><input type="text" id="ag-name" required class="w-full bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none"></div>
-                <div><label class="block text-xs text-gray-400 mb-1">Descripción</label><input type="text" id="ag-sub" class="w-full bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none"></div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Sistema</label>
-                        <select id="ag-system" class="w-full bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none">
-                            <option value="ambos">🔄 Ambos</option>
-                            <option value="tube">🎬 Tube Automate</option>
-                            <option value="shorts">⚡ Shorts System</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Color</label>
-                        <div class="flex items-center justify-between gap-1 pt-1">
-                            <button type="button" onclick="selectColor('col-purple')" class="color-btn w-6 h-6 rounded bg-purple-500 border-2 border-white ring-2 ring-purple-500/50" data-color="col-purple"></button>
-                            <button type="button" onclick="selectColor('col-blue')" class="color-btn w-6 h-6 rounded bg-blue-500 border-2 border-transparent hover:border-gray-500" data-color="col-blue"></button>
-                            <button type="button" onclick="selectColor('col-green')" class="color-btn w-6 h-6 rounded bg-green-500 border-2 border-transparent hover:border-gray-500" data-color="col-green"></button>
-                            <button type="button" onclick="selectColor('col-orange')" class="color-btn w-6 h-6 rounded bg-orange-500 border-2 border-transparent hover:border-gray-500" data-color="col-orange"></button>
-                            <button type="button" onclick="selectColor('col-pink')" class="color-btn w-6 h-6 rounded bg-pink-500 border-2 border-transparent hover:border-gray-500" data-color="col-pink"></button>
-                            <button type="button" onclick="selectColor('col-yellow')" class="color-btn w-6 h-6 rounded bg-yellow-500 border-2 border-transparent hover:border-gray-500" data-color="col-yellow"></button>
-                        </div>
-                        <input type="hidden" id="ag-color" value="col-purple">
-                    </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-textMuted mb-1">Nombre *</label>
+                    <input type="text" id="ag-name" class="w-full px-3 py-2 rounded-lg" placeholder="Ej: Editor Shorts">
                 </div>
-                <div><label class="block text-xs text-gray-400 mb-1">URL Webhook n8n (Opcional)</label><input type="text" id="ag-n8n" class="w-full bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none"></div>
-                <div class="pt-2 flex gap-3">
-                    <button type="button" onclick="closeModal('modal-agent')" class="flex-1 bg-gray-800 text-white py-2 rounded-lg text-sm font-medium hover:bg-gray-700">Cancelar</button>
-                    <button type="submit" class="flex-1 bg-purple-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-purple-500">Guardar</button>
+                <div>
+                    <label class="block text-xs text-textMuted mb-1">Descripción</label>
+                    <input type="text" id="ag-sub" class="w-full px-3 py-2 rounded-lg" placeholder="Ej: Edita en Premiere Pro">
                 </div>
-            </form>
+                <div>
+                    <label class="block text-xs text-textMuted mb-1">Sistema</label>
+                    <select id="ag-system" class="w-full px-3 py-2 rounded-lg">
+                        <option value="ambos">Ambos Sistemas (Tube & Shorts)</option>
+                        <option value="tube">Tube Automate</option>
+                        <option value="shorts">Shorts System</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-textMuted mb-2">Color de Identidad</label>
+                    <div class="flex gap-3" id="color-picker">
+                        <div class="w-8 h-8 rounded-full cursor-pointer bg-orange-500 ring-2 ring-white ring-offset-2 ring-offset-dark" data-color="col-orange" onclick="selectColor(this)"></div>
+                        <div class="w-8 h-8 rounded-full cursor-pointer bg-purple-500 opacity-50 hover:opacity-100" data-color="col-purple" onclick="selectColor(this)"></div>
+                        <div class="w-8 h-8 rounded-full cursor-pointer bg-blue-500 opacity-50 hover:opacity-100" data-color="col-blue" onclick="selectColor(this)"></div>
+                        <div class="w-8 h-8 rounded-full cursor-pointer bg-green-500 opacity-50 hover:opacity-100" data-color="col-green" onclick="selectColor(this)"></div>
+                        <div class="w-8 h-8 rounded-full cursor-pointer bg-pink-500 opacity-50 hover:opacity-100" data-color="col-pink" onclick="selectColor(this)"></div>
+                        <div class="w-8 h-8 rounded-full cursor-pointer bg-yellow-500 opacity-50 hover:opacity-100" data-color="col-yellow" onclick="selectColor(this)"></div>
+                    </div>
+                    <input type="hidden" id="ag-color" value="col-orange">
+                </div>
+                <div>
+                    <label class="block text-xs text-textMuted mb-1">URL Webhook n8n (Opcional)</label>
+                    <input type="text" id="ag-n8n" class="w-full px-3 py-2 rounded-lg" placeholder="http://...">
+                </div>
+                <button onclick="saveAgent()" class="w-full btn-primary py-2.5 rounded-lg font-bold mt-2">Guardar Agente</button>
+            </div>
         </div>
     </div>
 
-    <!-- Modal Tarea -->
-    <div id="modal-task" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center p-4">
-        <div class="bg-[#0a0a0f] border border-[#1a1a2e] rounded-2xl w-full max-w-md overflow-hidden transform transition-all shadow-2xl">
-            <div class="px-6 py-4 border-b border-[#1a1a2e] flex justify-between items-center bg-[#111118]">
-                <h3 class="font-bold text-lg" id="modal-task-title">Crear Tarea</h3>
-                <button onclick="closeModal('modal-task')" class="text-gray-500 hover:text-white"><i class="fas fa-times"></i></button>
+    <!-- MODAL: CREAR TAREA -->
+    <div id="modal-task" class="fixed inset-0 modal-overlay flex items-center justify-center z-50 hidden opacity-0 transition-opacity">
+        <div class="modal-content w-full max-w-md rounded-2xl p-6 transform scale-95 transition-transform" id="modal-task-content">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-lg font-bold">Nueva Tarea</h3>
+                <button onclick="closeModal('modal-task')" class="text-textMuted hover:text-white"><i class="fas fa-times"></i></button>
             </div>
-            <form id="form-task" class="p-6 space-y-4" onsubmit="saveTask(event)">
-                <input type="hidden" id="tk-id">
-                <div><label class="block text-xs text-gray-400 mb-1">Título *</label><input type="text" id="tk-title" required class="w-full bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none"></div>
-                <div><label class="block text-xs text-gray-400 mb-1">Descripción</label><textarea id="tk-desc" rows="2" class="w-full bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none"></textarea></div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Agente Asignado</label>
-                        <select id="tk-agent" class="w-full bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none">
-                            <option value="">Sin asignar</option>
-                            <!-- Filled dynamically -->
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Estado</label>
-                        <select id="tk-status" class="w-full bg-[#111118] border border-[#1a1a2e] rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none">
-                            <option value="pending">Pendiente</option>
-                            <option value="process">En Proceso</option>
-                            <option value="done">Completada</option>
-                        </select>
-                    </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-textMuted mb-1">Título *</label>
+                    <input type="text" id="tk-title" class="w-full px-3 py-2 rounded-lg" placeholder="Ej: Guion para video de finanzas">
                 </div>
-                <div class="pt-2 flex gap-3">
-                    <button type="button" onclick="closeModal('modal-task')" class="flex-1 bg-gray-800 text-white py-2 rounded-lg text-sm font-medium hover:bg-gray-700">Cancelar</button>
-                    <button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-500">Guardar</button>
+                <div>
+                    <label class="block text-xs text-textMuted mb-1">Descripción</label>
+                    <textarea id="tk-desc" class="w-full px-3 py-2 rounded-lg h-20 resize-none" placeholder="Detalles de la tarea..."></textarea>
                 </div>
-            </form>
+                <div>
+                    <label class="block text-xs text-textMuted mb-1">Asignar a Agente</label>
+                    <select id="tk-agent" class="w-full px-3 py-2 rounded-lg">
+                        <option value="">-- Sin asignar --</option>
+                        <!-- Filled by JS -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-textMuted mb-1">Estado Inicial</label>
+                    <select id="tk-status" class="w-full px-3 py-2 rounded-lg">
+                        <option value="pending">Pendiente</option>
+                        <option value="process">En Proceso</option>
+                        <option value="done">Completada</option>
+                    </select>
+                </div>
+                <button onclick="saveTask()" class="w-full btn-primary py-2.5 rounded-lg font-bold mt-2">Crear Tarea</button>
+            </div>
         </div>
     </div>
 
-    <!-- TOAST CONTAINER -->
-    <div id="toast-container" class="fixed bottom-6 right-6 z-[60] flex flex-col gap-2"></div>
-
-    <!-- MAIN SCRIPT -->
+    <!-- MAIN JAVASCRIPT -->
     <script>
-        /* =================================================================================
-           INSTRUCCIONES IMPORTANTES:
-           Como borraste tu proyecto de Supabase anterior, necesitas crear uno nuevo.
-           Pega la NUEVA URL y ANON KEY de tu nuevo proyecto de Supabase en las variables 
-           'SUPA_URL' y 'SUPA_KEY' de abajo.
-           ================================================================================= */
-        const SUPA_URL = "https://tmtigikluepahdynifgo.supabase.co"; // <-- REEMPLAZA ESTO
-        const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtdGlnaWtsdWVwYWhkeW5pZmdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNjI4MTYsImV4cCI6MjA5MDczODgxNn0.p5GjDSBDyUGVEw0kP749Ho1MPX3blnachpqVHwu3ll4"; // <-- REEMPLAZA ESTO
+        // ==========================================
+        // CONFIGURACIÓN DE SUPABASE (¡REEMPLAZA AQUÍ!)
+        // ==========================================
+        const SUPA_URL = "https://tmtigikluepahdynifgo.supabase.co"; 
+        const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtdGlnaWtsdWVwYWhkeW5pZmdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNjI4MTYsImV4cCI6MjA5MDczODgxNn0.p5GjDSBDyUGVEw0kP749Ho1MPX3blnachpqVHwu3ll4";
+        
+        // ESTADO GLOBAL
+        let state = {
+            currentSection: 'dashboard',
+            agents: [],
+            tasks: [],
+            documents: []
+        };
 
-        // Estado Global
-        let state = { currentSection: 'dashboard', agents: [], tasks: [], documents: [] };
-
-        // Headers base API REST
-        const headers = { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
-
-        /* ================= INICIALIZACIÓN ================= */
-        document.addEventListener('DOMContentLoaded', () => {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-            loadData();
-            setInterval(loadData, 30000); // Auto-refresh 30s
-        });
-
-        /* ================= NAVEGACIÓN SPA ================= */
-        function toggleSidebar() {
-            const sb = document.getElementById('sidebar');
-            const ov = document.getElementById('mobileOverlay');
-            sb.classList.toggle('-translate-x-full');
-            ov.classList.toggle('hidden');
-        }
-
-        function navigate(section) {
-            state.currentSection = section;
-            document.querySelectorAll('section').forEach(s => s.classList.add('section-hidden'));
+        // ==========================================
+        // UTILIDADES Y UI
+        // ==========================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
             
-            // Manage active styles in sidebar
-            document.querySelectorAll('.nav-link').forEach(l => {
-                l.classList.remove('bg-white/10', 'text-white');
-                if(l.getAttribute('onclick').includes(section)) l.classList.add('bg-white/10', 'text-white');
-            });
-            if(window.innerWidth < 1024) toggleSidebar();
-
-            const topTitle = document.getElementById('topbar-title');
-            const actionBtn = document.getElementById('topbar-action-btn');
-            actionBtn.classList.add('hidden');
-
-            if(['dashboard', 'agentes', 'produccion', 'director', 'documentos'].includes(section)) {
-                document.getElementById('sec-' + section).classList.remove('section-hidden');
-            } else {
-                document.getElementById('sec-info').classList.remove('section-hidden');
-                renderInfoCards(section);
-            }
-
-            // Contextual Topbar
-            switch(section) {
-                case 'dashboard': topTitle.innerHTML = '<i class="fas fa-chart-pie mr-2 text-purple-400"></i> Dashboard'; break;
-                case 'agentes': topTitle.innerHTML = '<i class="fas fa-robot mr-2 text-blue-400"></i> Gestión de Agentes'; actionBtn.classList.remove('hidden'); document.getElementById('topbar-action-text').innerText = 'Nuevo Agente'; break;
-                case 'produccion': topTitle.innerHTML = '<i class="fas fa-layer-group mr-2 text-green-400"></i> Producción'; actionBtn.classList.remove('hidden'); document.getElementById('topbar-action-text').innerText = 'Nueva Tarea'; break;
-                case 'director': topTitle.innerHTML = '<i class="fas fa-crown mr-2 text-yellow-500"></i> Director General'; break;
-                case 'documentos': topTitle.innerHTML = '<i class="fas fa-file-pdf mr-2 text-red-400"></i> Documentos'; break;
-            }
-        }
-
-        function handleTopbarAction() {
-            if(state.currentSection === 'agentes') openAgentModal();
-            else if(state.currentSection === 'produccion') openTaskModal();
-        }
-
-        /* ================= SUPABASE API ================= */
-        async function fetchAPI(table, method = 'GET', body = null, id = null) {
-            const url = `${SUPA_URL}/rest/v1/${table}${id ? `?id=eq.${id}` : '?select=*'}`;
-            try {
-                const res = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : null });
-                if(!res.ok) throw new Error(`Error: ${res.status}`);
-                return method === 'GET' || method === 'POST' ? await res.json() : true;
-            } catch(e) {
-                console.error(e);
-                showToast("Error de conexión con Supabase", "error");
-                return null;
-            }
-        }
-
-        async function loadData() {
-            const [ag, tk, dc] = await Promise.all([ fetchAPI('agents'), fetchAPI('tasks'), fetchAPI('documents') ]);
-            if(ag) state.agents = ag;
-            if(tk) state.tasks = tk;
-            if(dc) state.documents = dc;
+            let colorClass = 'bg-blue-500 border-blue-400 text-blue-100';
+            let icon = 'fa-info-circle';
             
-            updateCounters();
-            renderDashboard();
-            renderAgents();
-            renderKanban();
-            renderDocs();
-        }
-
-        /* ================= RENDERIZADO ================= */
-        function updateCounters() {
-            const activeAg = state.agents.filter(a => a.status === 'active').length;
-            const pend = state.tasks.filter(t => t.status === 'pending').length;
-            const proc = state.tasks.filter(t => t.status === 'process').length;
-            const done = state.tasks.filter(t => t.status === 'done').length;
-
-            document.getElementById('stat-agents').innerText = activeAg;
-            document.getElementById('stat-pending').innerText = pend;
-            document.getElementById('stat-process').innerText = proc;
-            document.getElementById('stat-done').innerText = done;
+            if (type === 'success') { colorClass = 'bg-green-600 border-green-500 text-white'; icon = 'fa-check-circle'; }
+            else if (type === 'error') { colorClass = 'bg-red-600 border-red-500 text-white'; icon = 'fa-exclamation-triangle'; }
             
-            document.getElementById('top-count-agents').innerText = activeAg;
-            document.getElementById('top-count-pending').innerText = pend;
-            document.getElementById('top-count-process').innerText = proc;
-            document.getElementById('top-count-done').innerText = done;
-
-            document.getElementById('nav-agent-count').innerText = state.agents.length;
-            document.getElementById('nav-doc-count').innerText = state.documents.length;
+            toast.className = `flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg ${colorClass} animate-fade`;
+            toast.innerHTML = `<i class="fas ${icon}"></i> <span class="text-sm font-medium">${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
 
-        function getIcon(name) {
+        function getEmojiForAgent(name) {
             const n = name.toLowerCase();
-            if(n.includes('dir')) return '👑'; if(n.includes('busc') || n.includes('idea')) return '🔍';
-            if(n.includes('guion') || n.includes('script')) return '✍️'; if(n.includes('voz') || n.includes('voice')) return '🎙️';
-            if(n.includes('visu') || n.includes('art')) return '🎨'; if(n.includes('edit')) return '🎬';
-            if(n.includes('publi')) return '📤'; if(n.includes('ana')) return '📊';
+            if (n.includes('director') || n.includes('jefe')) return '👑';
+            if (n.includes('busca') || n.includes('idea') || n.includes('seo')) return '🔍';
+            if (n.includes('guion') || n.includes('script') || n.includes('escr')) return '✍️';
+            if (n.includes('voz') || n.includes('voice') || n.includes('audio')) return '🎙️';
+            if (n.includes('visual') || n.includes('thumb') || n.includes('minia')) return '🎨';
+            if (n.includes('edit') || n.includes('video')) return '🎬';
+            if (n.includes('public') || n.includes('subir')) return '📤';
+            if (n.includes('anal') || n.includes('dato')) return '📊';
             return '🤖';
         }
 
-        function renderDashboard() {
-            // Agentes mini
-            const agGrid = document.getElementById('dash-agents-grid');
-            agGrid.innerHTML = state.agents.map(a => `
-                <div class="glass-card p-3 flex flex-col items-center justify-center text-center relative border-b-2 border-b-transparent ${a.color.replace('col-', 'border-b-')}">
-                    <div class="w-10 h-10 rounded-lg ${a.color}-bg bg-opacity-20 flex items-center justify-center text-lg mb-2 shadow-inner">${getIcon(a.name)}</div>
-                    <span class="text-xs font-bold truncate w-full">${a.name}</span>
-                    <div class="absolute top-2 right-2 ${a.status==='active'?'dot-active':'dot-paused'}"></div>
-                </div>
-            `).join('');
-
-            // Kanban mini
-            ['pending', 'process', 'done'].forEach(status => {
-                const col = document.getElementById(`dash-col-${status}`);
-                const tasks = state.tasks.filter(t => t.status === status).slice(0, 5); // top 5
-                col.innerHTML = tasks.length ? tasks.map(t => {
-                    const ag = state.agents.find(a => a.id === t.agent);
-                    const colorClass = ag ? ag.color : 'text-gray-500';
-                    return `<div class="bg-[#111118] p-2 rounded border border-[#1a1a2e] text-xs truncate flex justify-between items-center"><span class="truncate pr-2">${t.title}</span> <i class="fas fa-circle text-[8px] ${colorClass.replace('col-', 'text-')}"></i></div>`;
-                }).join('') : '<p class="text-[10px] text-gray-500 italic">Vacio</p>';
-            });
-        }
-
-        function renderAgents() {
-            const grid = document.getElementById('agents-grid');
-            grid.innerHTML = state.agents.map(a => {
-                const tasks = state.tasks.filter(t => t.agent === a.id);
-                const tagClass = a.system === 'tube' ? 'tag-tube' : (a.system === 'shorts' ? 'tag-shorts' : 'tag-ambos');
-                const tagText = a.system === 'tube' ? '🎬 Tube' : (a.system === 'shorts' ? '⚡ Shorts' : '🔄 Ambos');
-                
-                return `
-                <div class="glass-card p-5 ${a.color}-bar relative flex flex-col h-full">
-                    <div class="absolute top-4 right-4 bg-gray-800 text-[10px] px-2 py-0.5 rounded-full border border-gray-700 flex items-center gap-1">
-                        <div class="${a.status==='active'?'dot-active':'dot-paused'} w-1.5 h-1.5"></div> ${a.status==='active'?'Activo':'Pausado'}
-                    </div>
-                    <div class="flex items-center gap-4 mb-3">
-                        <div class="w-14 h-14 rounded-xl ${a.color}-bg bg-opacity-10 flex items-center justify-center text-2xl shadow-lg">${getIcon(a.name)}</div>
-                        <div>
-                            <h3 class="font-bold text-lg">${a.name}</h3>
-                            <span class="text-xs ${tagClass} px-2 py-0.5 rounded font-medium">${tagText}</span>
-                        </div>
-                    </div>
-                    <p class="text-sm text-gray-400 mb-4 flex-1">${a.sub || 'Sin descripción'}</p>
-                    
-                    <div class="grid grid-cols-3 gap-2 mb-4 bg-black/30 p-2 rounded-lg border border-white/5 text-center">
-                        <div><span class="block text-[10px] text-gray-500">PEND</span><span class="font-bold text-orange-400 text-xs">${tasks.filter(t=>t.status==='pending').length}</span></div>
-                        <div class="border-l border-r border-white/5"><span class="block text-[10px] text-gray-500">PROC</span><span class="font-bold text-blue-400 text-xs">${tasks.filter(t=>t.status==='process').length}</span></div>
-                        <div><span class="block text-[10px] text-gray-500">DONE</span><span class="font-bold text-green-400 text-xs">${tasks.filter(t=>t.status==='done').length}</span></div>
-                    </div>
-
-                    <div class="flex gap-2">
-                        <button onclick="toggleAgentStatus('${a.id}')" class="flex-1 bg-gray-800 hover:bg-gray-700 py-1.5 rounded text-xs font-medium transition-colors border border-gray-700">
-                            ${a.status==='active' ? '<i class="fas fa-pause text-gray-400"></i> Pausar' : '<i class="fas fa-play text-green-400"></i> Activar'}
-                        </button>
-                        <button onclick="deleteAgent('${a.id}')" class="w-8 bg-gray-800 hover:bg-red-500/20 hover:text-red-500 py-1.5 rounded text-xs transition-colors border border-gray-700"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        function renderKanban() {
-            ['pending', 'process', 'done'].forEach(status => {
-                const tasks = state.tasks.filter(t => t.status === status);
-                document.getElementById(`kb-count-${status}`).innerText = tasks.length;
-                
-                const col = document.getElementById(`kb-${status}`);
-                col.innerHTML = tasks.map(t => {
-                    const ag = state.agents.find(a => a.id === t.agent);
-                    const tagClass = ag ? ag.color + '-tag' : 'bg-gray-800 text-gray-400';
-                    const iconColor = ag ? ag.color.replace('col-', 'text-') : 'text-gray-500';
-                    
-                    return `
-                    <div class="bg-[#111118] border border-[#1a1a2e] hover:border-[#2d2d50] p-3 rounded-lg cursor-grab active:cursor-grabbing shadow-sm" draggable="true" ondragstart="drag(event, '${t.id}')">
-                        <h4 class="font-semibold text-sm mb-1">${t.title}</h4>
-                        ${t.description ? `<p class="text-xs text-gray-500 mb-3 line-clamp-2">${t.description}</p>` : ''}
-                        <div class="flex items-center justify-between mt-2">
-                            <span class="text-[10px] px-2 py-0.5 rounded font-medium ${tagClass} flex items-center gap-1"><i class="fas fa-robot ${iconColor}"></i> ${ag ? ag.name : 'Sin agente'}</span>
-                            <button onclick="deleteTask('${t.id}')" class="text-gray-600 hover:text-red-500 transition-colors"><i class="fas fa-trash text-xs"></i></button>
-                        </div>
-                    </div>`;
-                }).join('');
-            });
-        }
-
-        /* ================= DRAG & DROP ================= */
-        function drag(ev, id) { ev.dataTransfer.setData("id", id); }
-        function allowDrop(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drag-over'); }
-        async function drop(ev, status) {
-            ev.preventDefault();
-            document.querySelectorAll('.kanban-col').forEach(c => c.classList.remove('drag-over'));
-            const id = ev.dataTransfer.getData("id");
-            if(!id) return;
+        // ==========================================
+        // NAVEGACIÓN SPA
+        // ==========================================
+        function nav(section) {
+            state.currentSection = section;
             
-            // Update local instantly
-            const task = state.tasks.find(t => t.id === id);
-            if(task && task.status !== status) {
-                task.status = status;
-                renderKanban();
-                updateCounters();
-                renderDashboard();
-                // Update DB
-                await fetchAPI('tasks', 'PATCH', { status }, id);
+            // Ocultar todas
+            document.querySelectorAll('.hidden-section').forEach(el => el.style.display = 'none');
+            document.getElementById('sec-dashboard').style.display = 'none';
+            
+            // Mostrar activa
+            const activeSec = document.getElementById('sec-' + section);
+            if(activeSec) {
+                activeSec.style.display = 'block';
+                activeSec.classList.add('animate-fade');
+            }
+            
+            // Update Title
+            const titles = {
+                'dashboard': 'Dashboard General', 'agentes': 'Equipo IA', 'produccion': 'Kanban Producción',
+                'director': 'Director General', 'documentos': 'Base de Conocimiento', 'tube-automate': 'Tube Automate',
+                'shorts-system': 'Shorts System', 'studio': 'YouTube Studio', 'ingresos': 'Monetización'
+            };
+            document.getElementById('topbar-title').innerText = titles[section] || 'Dashboard';
+
+            // Menu activo
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            const activeNav = document.getElementById('nav-' + section);
+            if(activeNav) activeNav.classList.add('active');
+
+            // Botón Contextual
+            const btnCtx = document.getElementById('btn-context');
+            if (section === 'agentes' || section === 'dashboard') {
+                btnCtx.style.display = 'flex';
+                document.getElementById('btn-context-text').innerText = 'Nuevo Agente';
+            } else if (section === 'produccion') {
+                btnCtx.style.display = 'flex';
+                document.getElementById('btn-context-text').innerText = 'Nueva Tarea';
+            } else {
+                btnCtx.style.display = 'none';
+            }
+
+            // Cerrar sidebar movil
+            if(window.innerWidth < 768) toggleSidebar();
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            if(sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
             }
         }
 
-        /* ================= CRUD AGENTES ================= */
-        function openAgentModal() {
-            document.getElementById('form-agent').reset();
-            document.getElementById('ag-id').value = '';
-            document.getElementById('modal-agent-title').innerText = 'Crear Agente';
-            selectColor('col-purple');
-            document.getElementById('modal-agent').classList.remove('hidden');
+        // ==========================================
+        // SUPABASE API WRAPPERS
+        // ==========================================
+        async function apiGet(table) {
+            try {
+                const res = await fetch(`${SUPA_URL}/rest/v1/${table}?select=*`, {
+                    headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return await res.json();
+            } catch (e) {
+                console.error("GET Error:", e);
+                return [];
+            }
         }
 
-        function selectColor(color) {
-            document.getElementById('ag-color').value = color;
-            document.querySelectorAll('.color-btn').forEach(btn => {
-                if(btn.dataset.color === color) { btn.classList.remove('border-transparent'); btn.classList.add('border-white', 'ring-2'); }
-                else { btn.classList.add('border-transparent'); btn.classList.remove('border-white', 'ring-2'); }
+        async function apiPost(table, data) {
+            try {
+                const res = await fetch(`${SUPA_URL}/rest/v1/${table}`, {
+                    method: 'POST',
+                    headers: { 
+                        'apikey': SUPA_KEY, 
+                        'Authorization': `Bearer ${SUPA_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation' // CRITICO para que devuelva el objeto insertado y evitar errores 'null'
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const json = await res.json();
+                return json[0];
+            } catch (e) {
+                console.error("POST Error:", e);
+                throw new Error("No se pudo guardar. Verifica que el RLS esté desactivado en Supabase.");
+            }
+        }
+
+        async function apiPatch(table, id, data) {
+            try {
+                const res = await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${id}`, {
+                    method: 'PATCH',
+                    headers: { 
+                        'apikey': SUPA_KEY, 
+                        'Authorization': `Bearer ${SUPA_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const json = await res.json();
+                return json[0];
+            } catch (e) {
+                console.error("PATCH Error:", e);
+                throw e;
+            }
+        }
+
+        async function apiDelete(table, id) {
+            try {
+                await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${id}`, {
+                    method: 'DELETE',
+                    headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
+                });
+            } catch (e) {
+                console.error("DELETE Error:", e);
+                throw e;
+            }
+        }
+
+        // ==========================================
+        // CARGA Y RENDERIZADO DE DATOS
+        // ==========================================
+        async function loadData() {
+            try {
+                state.agents = await apiGet('agents');
+                state.tasks = await apiGet('tasks');
+                state.documents = await apiGet('documents');
+                renderAll();
+            } catch (e) {
+                showToast("Error de conexión con Supabase. Revisa credenciales.", "error");
+            }
+        }
+
+        function renderAll() {
+            renderTopStats();
+            renderDashboard();
+            renderAgentsList();
+            renderKanban();
+            renderDocuments();
+            updateAgentSelects();
+        }
+
+        function renderTopStats() {
+            const pend = state.tasks.filter(t => t.status === 'pending').length;
+            const proc = state.tasks.filter(t => t.status === 'process').length;
+            const done = state.tasks.filter(t => t.status === 'done').length;
+            const activeAg = state.agents.filter(a => a.status === 'active').length;
+
+            document.getElementById('top-pend').innerText = pend;
+            document.getElementById('top-proc').innerText = proc;
+            document.getElementById('top-done').innerText = done;
+            
+            document.getElementById('dash-agents').innerText = activeAg;
+            document.getElementById('dash-pend').innerText = pend;
+            document.getElementById('dash-proc').innerText = proc;
+            document.getElementById('dash-done').innerText = done;
+
+            document.getElementById('badge-agentes').innerText = state.agents.length;
+            document.getElementById('badge-docs').innerText = state.documents.length;
+        }
+
+        // Dibuja las mini-cards de agentes en el Dashboard
+        function renderDashboard() {
+            const grid = document.getElementById('grid-dashboard-agents');
+            grid.innerHTML = '';
+            
+            state.agents.forEach(ag => {
+                const isAct = ag.status === 'active';
+                const emoji = ag.icon || getEmojiForAgent(ag.name);
+                grid.innerHTML += `
+                    <div class="glass-card p-3 flex items-center gap-3 ${ag.color}-bar">
+                        <div class="w-10 h-10 rounded-lg bg-dark flex items-center justify-center text-xl border border-border">${emoji}</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-1.5">
+                                <h4 class="font-bold text-sm truncate">${ag.name}</h4>
+                                <div class="w-1.5 h-1.5 ${isAct ? 'dot-active' : 'dot-paused'}"></div>
+                            </div>
+                            <div class="text-[10px] text-textMuted uppercase">${ag.system}</div>
+                        </div>
+                    </div>
+                `;
             });
         }
 
-        async function saveAgent(e) {
-            e.preventDefault();
-            const id = document.getElementById('ag-id').value;
+        // Dibuja las tarjetas completas en la sección Agentes
+        function renderAgentsList() {
+            const grid = document.getElementById('grid-agents');
+            grid.innerHTML = '';
+
+            state.agents.forEach(ag => {
+                const isAct = ag.status === 'active';
+                const emoji = ag.icon || getEmojiForAgent(ag.name);
+                const tPend = state.tasks.filter(t => t.agent === ag.id && t.status==='pending').length;
+                const tProc = state.tasks.filter(t => t.agent === ag.id && t.status==='process').length;
+                
+                grid.innerHTML += `
+                    <div class="glass-card flex flex-col ${ag.color}-bar-bottom relative">
+                        <div class="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full border ${isAct ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-gray-500/10 text-gray-400 border-gray-500/20'}">
+                            ${isAct ? 'ACTIVO' : 'PAUSADO'}
+                        </div>
+                        <div class="p-5 flex-1">
+                            <div class="flex items-start gap-4 mb-3">
+                                <div class="w-12 h-12 rounded-xl bg-dark flex items-center justify-center text-2xl border border-border shadow-inner">${emoji}</div>
+                                <div>
+                                    <h3 class="font-bold text-lg">${ag.name}</h3>
+                                    <span class="text-[10px] px-2 py-0.5 rounded tag-${ag.system}">${ag.system.toUpperCase()}</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-textSecondary mb-4 line-clamp-2 h-8">${ag.sub || 'Sin descripción.'}</p>
+                            <div class="grid grid-cols-2 gap-2 text-center text-xs bg-dark p-2 rounded-lg border border-border">
+                                <div><div class="text-textMuted">Pendientes</div><div class="font-bold text-orange-400">${tPend}</div></div>
+                                <div><div class="text-textMuted">Procesando</div><div class="font-bold text-blue-400">${tProc}</div></div>
+                            </div>
+                        </div>
+                        <div class="p-3 border-t border-border bg-card/50 flex gap-2">
+                            <button onclick="toggleAgentStatus('${ag.id}', '${ag.status}')" class="flex-1 text-xs py-1.5 rounded bg-dark border border-border hover:bg-border transition text-textSecondary">
+                                <i class="fas ${isAct ? 'fa-pause' : 'fa-play'} mr-1"></i> ${isAct ? 'Pausar' : 'Activar'}
+                            </button>
+                            <button onclick="deleteAgent('${ag.id}')" class="w-8 text-xs rounded bg-dark border border-border hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/30 transition text-textMuted">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // ==========================================
+        // KANBAN LOGIC
+        // ==========================================
+        function renderKanban() {
+            const cols = { pending: '', process: '', done: '' };
+            let counts = { pending: 0, process: 0, done: 0 };
+
+            state.tasks.forEach(t => {
+                if(!cols[t.status]) return;
+                counts[t.status]++;
+                
+                const ag = state.agents.find(a => a.id === t.agent);
+                const agHtml = ag ? `<div class="mt-3 inline-flex items-center gap-1.5 text-[10px] px-2 py-1 rounded-md bg-dark border border-border"><div class="w-2 h-2 rounded-full ${ag.color.replace('col-', 'bg-')}"></div> ${ag.name}</div>` : '';
+
+                cols[t.status] += `
+                    <div class="bg-dark border border-border p-3 rounded-lg task-card shadow-sm hover:border-purple-500/50" draggable="true" ondragstart="drag(event, '${t.id}')" id="task-${t.id}">
+                        <div class="flex justify-between items-start mb-1">
+                            <h4 class="font-bold text-sm text-white">${t.title}</h4>
+                            <button onclick="deleteTask('${t.id}')" class="text-textMuted hover:text-red-400"><i class="fas fa-times text-xs"></i></button>
+                        </div>
+                        ${t.description ? `<p class="text-xs text-textMuted line-clamp-2">${t.description}</p>` : ''}
+                        ${agHtml}
+                    </div>
+                `;
+            });
+
+            document.getElementById('col-pending').innerHTML = cols.pending;
+            document.getElementById('col-process').innerHTML = cols.process;
+            document.getElementById('col-done').innerHTML = cols.done;
+            
+            document.getElementById('kb-count-pend').innerText = counts.pending;
+            document.getElementById('kb-count-proc').innerText = counts.process;
+            document.getElementById('kb-count-done').innerText = counts.done;
+        }
+
+        function drag(ev, id) {
+            ev.dataTransfer.setData("text", id);
+            ev.target.classList.add('dragging');
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        async function drop(ev, status) {
+            ev.preventDefault();
+            const id = ev.dataTransfer.getData("text");
+            document.getElementById('task-'+id)?.classList.remove('dragging');
+            
+            const task = state.tasks.find(t => t.id === id);
+            if(task && task.status !== status) {
+                const oldStatus = task.status;
+                task.status = status;
+                renderKanban(); renderTopStats(); // Optimistic UI update
+                
+                try {
+                    await apiPatch('tasks', id, { status });
+                } catch(e) {
+                    task.status = oldStatus; // Revert on fail
+                    renderKanban(); renderTopStats();
+                    showToast("Error al mover tarea", "error");
+                }
+            }
+        }
+
+        // ==========================================
+        // MODALS Y CRUD AGENTES/TAREAS
+        // ==========================================
+        function openContextModal() {
+            if(state.currentSection === 'produccion') {
+                document.getElementById('modal-task').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('modal-task').classList.remove('opacity-0');
+                    document.getElementById('modal-task-content').classList.remove('scale-95');
+                }, 10);
+            } else {
+                document.getElementById('modal-agent').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('modal-agent').classList.remove('opacity-0');
+                    document.getElementById('modal-agent-content').classList.remove('scale-95');
+                }, 10);
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('opacity-0');
+            document.getElementById(id+'-content').classList.add('scale-95');
+            setTimeout(() => document.getElementById(id).classList.add('hidden'), 200);
+        }
+
+        function selectColor(el) {
+            document.querySelectorAll('#color-picker div').forEach(d => {
+                d.classList.remove('ring-2', 'ring-white', 'ring-offset-2', 'ring-offset-dark', 'opacity-100');
+                d.classList.add('opacity-50');
+            });
+            el.classList.remove('opacity-50');
+            el.classList.add('ring-2', 'ring-white', 'ring-offset-2', 'ring-offset-dark', 'opacity-100');
+            document.getElementById('ag-color').value = el.getAttribute('data-color');
+        }
+
+        function updateAgentSelects() {
+            const sel = document.getElementById('tk-agent');
+            sel.innerHTML = '<option value="">-- Sin asignar --</option>';
+            state.agents.filter(a => a.status === 'active').forEach(a => {
+                sel.innerHTML += `<option value="${a.id}">${a.name}</option>`;
+            });
+        }
+
+        async function saveAgent() {
+            const name = document.getElementById('ag-name').value;
+            if(!name) return showToast("El nombre es obligatorio", "error");
+            
             const data = {
-                name: document.getElementById('ag-name').value,
+                name,
                 sub: document.getElementById('ag-sub').value,
                 system: document.getElementById('ag-system').value,
                 color: document.getElementById('ag-color').value,
                 n8n_url: document.getElementById('ag-n8n').value,
-                icon: getIcon(document.getElementById('ag-name').value)
+                icon: getEmojiForAgent(name)
             };
-            
-            const res = await fetchAPI('agents', id ? 'PATCH' : 'POST', data, id);
-            if(res) {
-                showToast(`Agente ${id ? 'actualizado' : 'creado'} con éxito`, "success");
-                closeModal('modal-agent');
-                loadData();
-            }
+
+            try {
+                const newAg = await apiPost('agents', data);
+                if(newAg) {
+                    state.agents.push(newAg);
+                    renderAll();
+                    closeModal('modal-agent');
+                    showToast("Agente creado exitosamente", "success");
+                    // Reset fields
+                    document.getElementById('ag-name').value = '';
+                    document.getElementById('ag-sub').value = '';
+                }
+            } catch(e) { showToast(e.message, "error"); }
         }
 
-        async function toggleAgentStatus(id) {
-            const ag = state.agents.find(a => a.id === id);
-            const newStatus = ag.status === 'active' ? 'paused' : 'active';
-            await fetchAPI('agents', 'PATCH', { status: newStatus }, id);
-            loadData();
+        async function toggleAgentStatus(id, current) {
+            const newStatus = current === 'active' ? 'paused' : 'active';
+            try {
+                const up = await apiPatch('agents', id, { status: newStatus });
+                if(up) {
+                    const idx = state.agents.findIndex(a => a.id === id);
+                    if(idx > -1) state.agents[idx].status = newStatus;
+                    renderAll();
+                    showToast(`Agente ${newStatus==='active'?'activado':'pausado'}`, "info");
+                }
+            } catch(e) { showToast("Error al actualizar estado", "error"); }
         }
 
         async function deleteAgent(id) {
-            if(confirm('¿Eliminar agente? Las tareas asignadas quedarán sin agente.')) {
-                await fetchAPI('agents', 'DELETE', null, id);
+            if(!confirm("¿Eliminar este agente? Sus tareas quedarán sin asignar.")) return;
+            try {
+                await apiDelete('agents', id);
+                state.agents = state.agents.filter(a => a.id !== id);
+                state.tasks.forEach(t => { if(t.agent === id) t.agent = null; });
+                renderAll();
                 showToast("Agente eliminado", "info");
-                loadData();
-            }
+            } catch(e) { showToast("Error al eliminar", "error"); }
         }
 
-        /* ================= CRUD TAREAS ================= */
-        function openTaskModal() {
-            document.getElementById('form-task').reset();
-            document.getElementById('tk-id').value = '';
+        async function saveTask() {
+            const title = document.getElementById('tk-title').value;
+            if(!title) return showToast("El título es obligatorio", "error");
             
-            const sel = document.getElementById('tk-agent');
-            sel.innerHTML = '<option value="">Sin asignar</option>' + state.agents.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
-            
-            document.getElementById('modal-task').classList.remove('hidden');
-        }
-
-        async function saveTask(e) {
-            e.preventDefault();
             const data = {
-                title: document.getElementById('tk-title').value,
+                title,
                 description: document.getElementById('tk-desc').value,
+                agent: document.getElementById('tk-agent').value || null,
                 status: document.getElementById('tk-status').value
             };
-            const ag = document.getElementById('tk-agent').value;
-            if(ag) data.agent = ag;
 
-            await fetchAPI('tasks', 'POST', data);
-            showToast("Tarea creada", "success");
-            closeModal('modal-task');
-            loadData();
+            try {
+                const newTk = await apiPost('tasks', data);
+                if(newTk) {
+                    state.tasks.push(newTk);
+                    renderAll();
+                    closeModal('modal-task');
+                    showToast("Tarea creada", "success");
+                    document.getElementById('tk-title').value = '';
+                    document.getElementById('tk-desc').value = '';
+                }
+            } catch(e) { showToast(e.message, "error"); }
         }
 
         async function deleteTask(id) {
-            await fetchAPI('tasks', 'DELETE', null, id);
-            loadData();
+            try {
+                await apiDelete('tasks', id);
+                state.tasks = state.tasks.filter(t => t.id !== id);
+                renderAll();
+            } catch(e) { showToast("Error al eliminar", "error"); }
         }
 
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        // ==========================================
+        // PDF EXTRACTION LOGIC
+        // ==========================================
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
-        /* ================= DOCUMENTOS & PDF ================= */
-        function handleDragOver(e) { e.preventDefault(); document.getElementById('dropzone').classList.add('border-purple-500', 'bg-[#111118]'); }
-        function handleDragLeave(e) { e.preventDefault(); document.getElementById('dropzone').classList.remove('border-purple-500', 'bg-[#111118]'); }
-        function handleDrop(e) {
-            e.preventDefault();
-            handleDragLeave(e);
-            if(e.dataTransfer.files.length > 0) processFile(e.dataTransfer.files[0]);
+        function handlePdfDrop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('dragover');
+            if (ev.dataTransfer.files && ev.dataTransfer.files[0]) {
+                processPDF(ev.dataTransfer.files[0]);
+            }
         }
-        function handleFileSelect(e) { if(e.target.files.length > 0) processFile(e.target.files[0]); }
+        function handlePdfSelect(ev) {
+            if (ev.target.files && ev.target.files[0]) {
+                processPDF(ev.target.files[0]);
+            }
+        }
 
-        async function processFile(file) {
-            if(file.type !== 'application/pdf') return showToast("Solo archivos PDF permitidos", "error");
+        async function processPDF(file) {
+            if (file.type !== "application/pdf") return showToast("Solo se permiten archivos PDF", "error");
             
-            document.getElementById('upload-progress').classList.remove('hidden');
-            document.getElementById('upload-status-text').innerText = 'Leyendo PDF...';
-
+            const upBox = document.getElementById('upload-progress');
+            const upBar = document.getElementById('upload-bar');
+            const upPct = document.getElementById('upload-pct');
+            const upStat = document.getElementById('upload-status');
+            
+            document.getElementById('upload-filename').innerText = file.name;
+            upBox.classList.remove('hidden');
+            upBar.style.width = '10%'; upPct.innerText = '10%';
+            
             try {
                 const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-                let fullText = '';
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
                 
-                document.getElementById('upload-status-text').innerText = 'Extrayendo texto...';
-                for(let i = 1; i <= pdf.numPages; i++) {
+                let fullText = "";
+                const totalPages = pdf.numPages;
+                
+                for (let i = 1; i <= totalPages; i++) {
                     const page = await pdf.getPage(i);
                     const content = await page.getTextContent();
-                    fullText += content.items.map(item => item.str).join(' ') + '\n';
+                    const strings = content.items.map(item => item.str);
+                    fullText += strings.join(" ") + "\n";
+                    
+                    // Update progress
+                    const pct = Math.floor(10 + ((i / totalPages) * 60));
+                    upBar.style.width = `${pct}%`; upPct.innerText = `${pct}%`;
                 }
 
-                // Limitar y limpiar texto
-                fullText = fullText.replace(/\s+/g, ' ').substring(0, 45000); 
+                upStat.innerText = "Guardando en Base de Conocimiento...";
+                upBar.style.width = '90%'; upPct.innerText = '90%';
 
-                document.getElementById('upload-status-text').innerText = 'Guardando en Supabase...';
-                
-                const data = {
+                // Limit text to avoid DB limits (50k chars approx)
+                if(fullText.length > 50000) fullText = fullText.substring(0, 50000);
+
+                const dbData = {
                     name: file.name.replace('.pdf', ''),
                     file_name: file.name,
                     file_size: file.size,
                     content_text: fullText
                 };
 
-                await fetchAPI('documents', 'POST', [data]);
-                showToast("Documento procesado y guardado", "success");
-                loadData();
-            } catch(e) {
-                console.error(e);
-                showToast("Error procesando el PDF", "error");
+                const newDoc = await apiPost('documents', dbData);
+                if(newDoc) {
+                    state.documents.push(newDoc);
+                    renderDocuments();
+                    showToast("Documento indexado con éxito", "success");
+                }
+            } catch (error) {
+                console.error(error);
+                showToast("Error al extraer texto del PDF", "error");
             } finally {
-                document.getElementById('upload-progress').classList.add('hidden');
+                setTimeout(() => {
+                    upBox.classList.add('hidden');
+                    upBar.style.width = '0%';
+                    upStat.innerText = "Extrayendo texto del PDF...";
+                }, 1000);
             }
         }
 
-        function renderDocs() {
-            const list = document.getElementById('docs-list');
-            list.innerHTML = state.documents.length ? state.documents.map(d => `
-                <div class="flex items-center justify-between bg-[#111118] p-3 rounded-lg border border-[#1a1a2e]">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-file-pdf text-red-500 text-xl"></i>
-                        <div>
-                            <p class="text-sm font-semibold truncate w-40 sm:w-64">${d.name}</p>
-                            <p class="text-[10px] text-gray-500">${(d.file_size/1024).toFixed(1)} KB • ${(d.content_text?.length || 0).toLocaleString()} chars</p>
+        function renderDocuments() {
+            const list = document.getElementById('list-documents');
+            document.getElementById('doc-count-text').innerText = `${state.documents.length} archivos`;
+            list.innerHTML = '';
+            
+            if(state.documents.length === 0) {
+                list.innerHTML = '<div class="text-center text-textMuted py-8 text-xs">Aún no hay documentos subidos.</div>';
+                return;
+            }
+
+            state.documents.forEach(doc => {
+                const kb = Math.round(doc.file_size / 1024);
+                list.innerHTML += `
+                    <div class="bg-dark border border-border p-3 rounded-lg flex items-center gap-3">
+                        <div class="w-10 h-10 rounded bg-red-500/10 text-red-500 flex items-center justify-center text-lg"><i class="fas fa-file-pdf"></i></div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-sm truncate text-white">${doc.name}</h4>
+                            <div class="text-[10px] text-textMuted flex gap-3 mt-1">
+                                <span><i class="fas fa-weight-hanging"></i> ${kb} KB</span>
+                                <span class="text-green-400"><i class="fas fa-check-circle"></i> Extraído</span>
+                            </div>
                         </div>
+                        <button onclick="deleteDocument('${doc.id}')" class="w-8 h-8 rounded hover:bg-red-500/20 text-textMuted hover:text-red-400 transition"><i class="fas fa-trash"></i></button>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs text-green-400 bg-green-500/10 px-2 py-0.5 rounded flex items-center gap-1"><i class="fas fa-check"></i> Listo</span>
-                        <button onclick="deleteDoc('${d.id}')" class="text-gray-500 hover:text-red-500"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-            `).join('') : '<p class="text-center text-gray-500 py-4 text-xs italic">No hay documentos subidos</p>';
+                `;
+            });
         }
 
-        async function deleteDoc(id) { await fetchAPI('documents', 'DELETE', null, id); loadData(); }
+        async function deleteDocument(id) {
+            if(!confirm("¿Eliminar este documento de la base de conocimiento?")) return;
+            try {
+                await apiDelete('documents', id);
+                state.documents = state.documents.filter(d => d.id !== id);
+                renderDocuments();
+                showToast("Documento eliminado", "info");
+            } catch(e) { showToast("Error al eliminar", "error"); }
+        }
 
-        /* ================= CHAT & WEBHOOK ================= */
-        function appendMsg(text, isBot = false, isSystem = false) {
-            const container = document.getElementById('chat-messages');
-            let html = '';
+        // ==========================================
+        // CHAT N8N LOGIC
+        // ==========================================
+        function fillChat(text) {
+            document.getElementById('chat-input').value = text;
+            document.getElementById('chat-input').focus();
+        }
+
+        function addMessageToChat(text, sender = 'user') {
+            const box = document.getElementById('chat-box');
+            const isUser = sender === 'user';
             
-            if(isSystem) {
-                html = `<div class="flex justify-center"><div class="bg-green-500/10 border border-green-500/30 text-green-400 text-xs px-3 py-1.5 rounded-full shadow-sm">${text}</div></div>`;
-            } else if(isBot) {
-                html = `<div class="flex justify-start"><div class="max-w-[85%] sm:max-w-[75%] bg-[#111118] border border-[#1a1a2e] rounded-2xl rounded-tl-sm p-4 shadow-lg relative"><span class="absolute -top-2.5 left-4 bg-yellow-500/20 border border-yellow-500/50 text-yellow-500 text-[9px] font-bold px-2 py-0.5 rounded-full">👑 Director</span><p class="text-sm text-gray-200 mt-1 whitespace-pre-wrap">${text}</p></div></div>`;
+            let html = '';
+            if (isUser) {
+                html = `
+                <div class="flex gap-3 justify-end max-w-[85%] ml-auto animate-fade">
+                    <div class="bg-primary text-white p-3 rounded-2xl rounded-tr-sm text-sm">${text}</div>
+                </div>`;
             } else {
-                html = `<div class="flex justify-end"><div class="max-w-[85%] sm:max-w-[75%] bg-purple-600 rounded-2xl rounded-tr-sm p-3 shadow-lg shadow-purple-500/20 text-white"><p class="text-sm">${text}</p></div></div>`;
+                html = `
+                <div class="flex gap-3 max-w-[85%] animate-fade">
+                    <div class="w-8 h-8 rounded-full bg-card border border-border flex-shrink-0 flex items-center justify-center shadow-lg">👑</div>
+                    <div class="bg-card border border-border p-3 rounded-2xl rounded-tl-sm text-sm text-textSecondary">${text}</div>
+                </div>`;
             }
             
-            container.insertAdjacentHTML('beforeend', html);
-            container.scrollTop = container.scrollHeight;
+            box.insertAdjacentHTML('beforeend', html);
+            box.scrollTop = box.scrollHeight;
         }
 
         function showTyping() {
-            const id = 'typing-' + Date.now();
-            const html = `<div id="${id}" class="flex justify-start"><div class="bg-[#111118] border border-[#1a1a2e] rounded-2xl rounded-tl-sm py-2 px-4"><div class="flex gap-1"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>`;
-            document.getElementById('chat-messages').insertAdjacentHTML('beforeend', html);
-            return id;
+            const box = document.getElementById('chat-box');
+            const html = `
+            <div id="typing-indicator" class="flex gap-3 max-w-[85%] animate-fade">
+                <div class="w-8 h-8 rounded-full bg-card border border-border flex-shrink-0 flex items-center justify-center">👑</div>
+                <div class="bg-card border border-border p-3 rounded-2xl rounded-tl-sm text-sm flex gap-1 items-center h-[44px]">
+                    <div class="w-2 h-2 bg-textMuted rounded-full typing-dot"></div>
+                    <div class="w-2 h-2 bg-textMuted rounded-full typing-dot"></div>
+                    <div class="w-2 h-2 bg-textMuted rounded-full typing-dot"></div>
+                </div>
+            </div>`;
+            box.insertAdjacentHTML('beforeend', html);
+            box.scrollTop = box.scrollHeight;
         }
 
-        function sendSuggestion(text) { document.getElementById('chat-input').value = text; sendChatMessage(); }
-        function handleChatKeypress(e) { if(e.key === 'Enter') sendChatMessage(); }
-
-        async function testWebhook() {
-            const url = document.getElementById('n8n-webhook-url').value;
-            if(!url) return showToast("Ingresa una URL de webhook", "error");
-            try {
-                const res = await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ message: "ping" }) });
-                if(res.ok) showToast("Conexión exitosa con n8n", "success");
-                else throw new Error("Status " + res.status);
-            } catch(e) { showToast("Error conectando a n8n: " + e.message, "error"); }
+        function removeTyping() {
+            const el = document.getElementById('typing-indicator');
+            if(el) el.remove();
         }
 
         async function sendChatMessage() {
             const input = document.getElementById('chat-input');
             const msg = input.value.trim();
             if(!msg) return;
-            
-            appendMsg(msg, false);
+
+            const webhookUrl = document.getElementById('webhook-url').value;
+            if(!webhookUrl) return showToast("Configura la URL del Webhook primero", "error");
+
+            addMessageToChat(msg, 'user');
             input.value = '';
-            const typeId = showTyping();
-            
-            const contextDocs = state.documents.map(d => `[DOC: ${d.name}]\n${d.content_text}`).join('\n\n---\n\n');
-            const url = document.getElementById('n8n-webhook-url').value;
+            showTyping();
+
+            // Preparar Contexto
+            let contextText = state.documents.map(d => `[Doc: ${d.name}]\n${d.content_text}`).join("\n\n");
+            if(contextText.length > 80000) contextText = contextText.substring(0, 80000);
+
+            const payload = {
+                message: msg,
+                context: contextText,
+                agents: state.agents.map(a => ({id: a.id, name: a.name, status: a.status}))
+            };
 
             try {
-                const res = await fetch(url, {
+                const res = await fetch(webhookUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: msg, context: contextDocs, user_id: "admin" })
+                    body: JSON.stringify(payload)
                 });
-
-                document.getElementById(typeId).remove();
-
-                if(!res.ok) throw new Error("Error HTTP");
+                
+                removeTyping();
+                if(!res.ok) throw new Error("Error en Webhook");
                 
                 const data = await res.json();
-                const botReply = data.response || (data.candidates && data.candidates[0].content.parts[0].text) || JSON.stringify(data);
+                let botReply = data.response || data.text || data.output || JSON.stringify(data);
                 
-                appendMsg(botReply, true);
-
-                // Automations
+                // Detectar comandos
                 if(botReply.includes('[CREAR_TAREA]') || botReply.includes('[CREAR_AGENTE]')) {
+                    botReply = botReply.replace(/\[CREAR_TAREA\]/g, '').replace(/\[CREAR_AGENTE\]/g, '');
                     setTimeout(() => {
-                        loadData();
-                        appendMsg("✅ Automatización detectada. Datos sincronizados con Supabase.", false, true);
+                        loadData(); // Auto refresh
+                        showToast("La IA ha actualizado la base de datos", "success");
                     }, 2000);
                 }
 
+                addMessageToChat(botReply, 'bot');
             } catch(e) {
-                document.getElementById(typeId).remove();
-                appendMsg("❌ Error de conexión con el Webhook. Verifica que n8n esté activo y la URL sea correcta.", true);
+                removeTyping();
+                addMessageToChat("Error de conexión con el Webhook. ¿Está activo en n8n?", 'bot');
             }
         }
 
-        /* ================= INFO SECTIONS ================= */
-        const infoData = {
-            tube: {
-                title: '<i class="fas fa-play-circle text-red-500"></i> Tube Automate',
-                cards: [
-                    { t: "Roles System", i: "fa-users", c: "text-blue-400", d: "Operator (100% execution) → Manager (QA & Systems) → Owner (Strategy)" },
-                    { t: "The Trifecta", i: "fa-triangle-exclamation", c: "text-orange-400", d: "1. Crack Videos<br>2. Search Videos<br>3. Trending Videos" },
-                    { t: "Triumvirate", i: "fa-crown", c: "text-yellow-400", d: "• Titles: <50 chars, EMV 40%+<br>• Thumbnails: ≤4 words, high contrast<br>• Watch Time: Hook 3s, Pattern breaks" }
-                ]
-            },
-            shorts: {
-                title: '<i class="fas fa-bolt text-cyan-400"></i> Shorts System',
-                cards: [
-                    { t: "Viral Formula", i: "fa-fire", c: "text-orange-500", d: "'The + Emotion + Character + Ever'<br>Example: The SADDEST Dog Ever 😭" },
-                    { t: "10 Sources", i: "fa-database", c: "text-green-400", d: "Google News, Reddit, YouTube, TikTok, Facebook, Twitter, IG, Pinterest, Quora, Newsletters" },
-                    { t: "Retention Matrix", i: "fa-magnet", c: "text-purple-400", d: "Hook (0-3s): Visually shocking<br>Body: Fast paced, no dead air<br>Reward: Only at the very last second" }
-                ]
-            },
-            studio: {
-                title: '<i class="fas fa-chart-line text-green-500"></i> YouTube Studio',
-                cards: [
-                    { t: "Studio Access", i: "fa-external-link-alt", c: "text-red-500", d: "<button onclick='window.open(\"https://studio.youtube.com\")' class='mt-2 bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-xs font-bold w-full'>Abrir YT Studio</button>" },
-                    { t: "Rule of Revision", i: "fa-sync", c: "text-blue-400", d: "Evalúa cada 10 videos. Si no hay mejora en vistas/retención, cambia 1 variable (Miniatura, Hook o Temática)." },
-                    { t: "Key Metrics", i: "fa-bullseye", c: "text-green-400", d: "• CTR a las 3h: Objetivo ≥7%<br>• AVD (Average View Duration): ≥50%<br>• Swipe-away (Shorts): ≤30%" }
-                ]
-            },
-            ingresos: {
-                title: '<i class="fas fa-dollar-sign text-emerald-400"></i> Monetización',
-                cards: [
-                    { t: "Roadmap to $5K/mo", i: "fa-map", c: "text-purple-400", d: "Meta: 100K Views mensuales<br>$1K Ads + $500 Brands + $2.5K Products + $1K Affiliates" },
-                    { t: "The 5 Methods", i: "fa-list-ol", c: "text-emerald-400", d: "1. Affiliates (Day 1)<br>2. Ad Revenue (1K Subs)<br>3. Brand Deals (5K Subs)<br>4. Own Products (5K Subs)<br>5. Exclusive Community" }
-                ]
-            }
+        function testWebhook() {
+            showToast("Enviando ping al webhook...", "info");
+            sendChatMessage("Ping de prueba. Responde 'Conexión Exitosa'.");
+        }
+
+        // ==========================================
+        // INIT
+        // ==========================================
+        window.onload = () => {
+            loadData();
+            // Auto refresh cada 30 seg
+            setInterval(loadData, 30000);
         };
-
-        function renderInfoCards(section) {
-            const data = infoData[section];
-            if(!data) return;
-            document.getElementById('info-title').innerHTML = data.title;
-            document.getElementById('info-content').innerHTML = data.cards.map(c => `
-                <div class="glass-card p-6 border-t-2 border-t-[#2d2d50]">
-                    <div class="w-12 h-12 rounded-lg bg-[#111118] border border-[#1a1a2e] flex items-center justify-center mb-4"><i class="fas ${c.i} ${c.c} text-xl"></i></div>
-                    <h3 class="font-bold text-lg mb-2">${c.t}</h3>
-                    <p class="text-sm text-gray-400 leading-relaxed">${c.d}</p>
-                </div>
-            `).join('');
-        }
-
-        /* ================= UTILS ================= */
-        function showToast(msg, type="info") {
-            const colors = { success: "border-green-500 text-green-400 bg-green-500/10", error: "border-red-500 text-red-400 bg-red-500/10", info: "border-blue-500 text-blue-400 bg-blue-500/10" };
-            const icons = { success: "fa-check-circle", error: "fa-exclamation-circle", info: "fa-info-circle" };
-            
-            const toast = document.createElement('div');
-            toast.className = `toast flex items-center gap-3 px-4 py-3 rounded-xl border ${colors[type]} backdrop-blur-md shadow-lg`;
-            toast.innerHTML = `<i class="fas ${icons[type]} text-lg"></i> <span class="text-sm font-medium">${msg}</span>`;
-            
-            document.getElementById('toast-container').appendChild(toast);
-            setTimeout(() => toast.classList.add('show'), 10);
-            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
-        }
-
     </script>
 </body>
 </html>
