@@ -4,526 +4,435 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZenvioGQ - Dashboard</title>
-    <!-- Tailwind CSS (V4) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #000000;
-            color: #ffffff;
-            overflow-x: hidden;
-        }
-        
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #2d2d50;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #4b5563;
+        :root {
+            --bg-body: #000000;
+            --bg-sidebar: #060609;
+            --bg-card: #111118;
+            --bg-modal: #0a0a0f;
+            --border-normal: #1a1a2e;
+            --border-hover: #2d2d50;
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --text-muted: #6b7280;
+            --accent-purple: #6366f1;
         }
 
-        /* Glassmorphism & Cards */
-        .glass-panel {
-            background: rgba(17, 17, 24, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid #1a1a2e;
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden;
         }
-        .card {
-            background-color: #111118;
-            border: 1px solid #1a1a2e;
+
+        /* Glassmorphism Classes */
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-normal);
             border-radius: 14px;
             transition: all 0.3s ease;
         }
-        .card:hover {
+        
+        .glass-card:hover {
+            border-color: var(--border-hover);
             transform: translateY(-2px);
-            border-color: #2d2d50;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
         }
+
+        .glass-panel {
+            background: rgba(17, 17, 24, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-normal);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
 
         /* Agent Colors */
-        /* Orange */
-        .col-orange-icon { background: linear-gradient(135deg, #f97316, #fdba74); }
-        .col-orange-bar { border-bottom: 3px solid #f97316; }
-        .col-orange-tag { background: rgba(249, 115, 22, 0.1); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.2); }
-        /* Purple */
-        .col-purple-icon { background: linear-gradient(135deg, #8b5cf6, #c4b5fd); }
-        .col-purple-bar { border-bottom: 3px solid #8b5cf6; }
-        .col-purple-tag { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.2); }
-        /* Blue */
-        .col-blue-icon { background: linear-gradient(135deg, #3b82f6, #93c5fd); }
-        .col-blue-bar { border-bottom: 3px solid #3b82f6; }
-        .col-blue-tag { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
-        /* Green */
-        .col-green-icon { background: linear-gradient(135deg, #22c55e, #86efac); }
-        .col-green-bar { border-bottom: 3px solid #22c55e; }
-        .col-green-tag { background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); }
-        /* Pink */
-        .col-pink-icon { background: linear-gradient(135deg, #ec4899, #f9a8d4); }
-        .col-pink-bar { border-bottom: 3px solid #ec4899; }
-        .col-pink-tag { background: rgba(236, 72, 153, 0.1); color: #ec4899; border: 1px solid rgba(236, 72, 153, 0.2); }
-        /* Yellow */
-        .col-yellow-icon { background: linear-gradient(135deg, #eab308, #fef08a); }
-        .col-yellow-bar { border-bottom: 3px solid #eab308; }
-        .col-yellow-tag { background: rgba(234, 179, 8, 0.1); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.2); }
+        .col-orange-text { color: #f97316; } 
+        .col-orange-bg { background-color: #f97316; } 
+        .col-orange-border { border-color: #f97316; }
+        .col-orange-tag { background-color: rgba(249, 115, 22, 0.1); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.2); }
 
-        /* Sidebar & Mobile Overlay */
-        #sidebar {
-            width: 240px;
-            background-color: #060609;
-            border-right: 1px solid #1a1a2e;
-            transition: transform 0.3s ease;
-        }
-        @media (max-width: 768px) {
-            #sidebar {
-                transform: translateX(-100%);
-                position: fixed;
-                z-index: 50;
-                height: 100vh;
-            }
-            #sidebar.open {
-                transform: translateX(0);
-            }
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0,0,0,0.7);
-                z-index: 40;
-                backdrop-filter: blur(4px);
-            }
-            .sidebar-overlay.active {
-                display: block;
-            }
-        }
+        .col-purple-text { color: #8b5cf6; } 
+        .col-purple-bg { background-color: #8b5cf6; } 
+        .col-purple-border { border-color: #8b5cf6; }
+        .col-purple-tag { background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.2); }
 
-        /* Nav Items */
-        .nav-item.active {
-            background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, transparent 100%);
-            border-left: 3px solid #6366f1;
-            color: #fff;
-        }
+        .col-blue-text { color: #3b82f6; } 
+        .col-blue-bg { background-color: #3b82f6; } 
+        .col-blue-border { border-color: #3b82f6; }
+        .col-blue-tag { background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
 
-        /* Gradient Text */
-        .text-gradient {
-            background-clip: text;
+        .col-green-text { color: #22c55e; } 
+        .col-green-bg { background-color: #22c55e; } 
+        .col-green-border { border-color: #22c55e; }
+        .col-green-tag { background-color: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); }
+
+        .col-pink-text { color: #ec4899; } 
+        .col-pink-bg { background-color: #ec4899; } 
+        .col-pink-border { border-color: #ec4899; }
+        .col-pink-tag { background-color: rgba(236, 72, 153, 0.1); color: #ec4899; border: 1px solid rgba(236, 72, 153, 0.2); }
+
+        .col-yellow-text { color: #eab308; } 
+        .col-yellow-bg { background-color: #eab308; } 
+        .col-yellow-border { border-color: #eab308; }
+        .col-yellow-tag { background-color: rgba(234, 179, 8, 0.1); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.2); }
+
+        /* Utilities */
+        .gradient-text {
+            background: linear-gradient(to right, #8b5cf6, #3b82f6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-image: linear-gradient(to right, #8b5cf6, #3b82f6);
         }
-
-        /* Buttons */
+        
         .btn-primary {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            transition: all 0.2s;
+            background: linear-gradient(to right, #6366f1, #8b5cf6);
+            color: white;
+            transition: all 0.3s ease;
         }
         .btn-primary:hover {
             box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
             transform: translateY(-1px);
         }
 
-        /* Modals */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal.active {
-            display: flex;
-            animation: fadeIn 0.2s ease-out;
-        }
-        .modal-content {
-            background-color: #0a0a0f;
-            border: 1px solid #1a1a2e;
-            animation: slideUp 0.3s ease-out;
-        }
+        .hide { display: none !important; }
+        .active-nav { background: rgba(99, 102, 241, 0.1); color: #fff; border-right: 3px solid var(--accent-purple); }
 
         /* Animations */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(20px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+        @keyframes pulse-dot { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
+        .dot-active { border-radius: 50%; animation: pulse-dot 2s infinite; }
         
-        .dot-pulse {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-        }
+        @keyframes slideIn { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-animate { animation: slideIn 0.3s ease-out forwards; }
 
-        /* Toast Notifications */
-        #toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        /* Inputs */
+        .form-input {
+            width: 100%; background: #000; border: 1px solid var(--border-normal); border-radius: 8px;
+            padding: 0.75rem 1rem; color: #fff; outline: none; transition: border 0.3s;
         }
-        .toast {
-            padding: 12px 20px;
-            border-radius: 8px;
-            color: white;
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            animation: slideInRight 0.3s ease-out forwards;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .toast.success { background-color: #064e3b; border-color: #059669; }
-        .toast.error { background-color: #7f1d1d; border-color: #dc2626; }
-        .toast.info { background-color: #1e3a8a; border-color: #2563eb; }
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-
-        /* Kanban */
-        .kanban-col {
-            min-height: 200px;
-        }
-        .task-card {
-            cursor: grab;
-        }
-        .task-card:active {
-            cursor: grabbing;
-        }
-        .drag-over {
-            background-color: rgba(255,255,255,0.05);
-            border: 1px dashed #4b5563;
-        }
-
-        /* Select Color specific styles */
-        .color-option.selected {
-            border: 2px solid white;
-            transform: scale(1.1);
-        }
+        .form-input:focus { border-color: var(--accent-purple); }
+        
+        /* Drag and Drop Kanban */
+        .kanban-column { min-height: 200px; }
+        .kanban-card.dragging { opacity: 0.5; }
+        .drag-over { background: rgba(255,255,255,0.02); border: 1px dashed var(--border-hover); }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden">
+<body class="flex h-screen text-sm md:text-base">
 
     <!-- Mobile Overlay -->
-    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/80 z-40 hide md:hide" onclick="toggleSidebar()"></div>
 
     <!-- SIDEBAR -->
-    <aside id="sidebar" class="flex flex-col h-full flex-shrink-0">
+    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 w-64 bg-[#060609] border-r border-[#1a1a2e] flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
         <!-- Logo -->
-        <div class="h-16 flex items-center px-6 border-b border-gray-800">
-            <div class="w-8 h-8 rounded bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center font-bold text-white mr-3 shadow-lg">Z</div>
-            <h1 class="text-xl font-bold tracking-tight">Zenvio<span class="text-gradient">GQ</span></h1>
+        <div class="p-6 border-b border-[#1a1a2e] flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center font-bold text-white shadow-[0_0_15px_rgba(139,92,246,0.3)]">Z</div>
+            <h1 class="text-xl font-bold tracking-tight">Zenvio<span class="gradient-text">GQ</span></h1>
+            <button class="md:hidden ml-auto text-gray-400 hover:text-white" onclick="toggleSidebar()">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
 
-        <!-- Navigation -->
+        <!-- Nav Links -->
         <div class="flex-1 overflow-y-auto py-4">
-            <div class="px-6 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Principal</div>
-            <a href="#" onclick="switchSection('dashboard', this)" class="nav-item active flex items-center px-6 py-3 text-gray-300 hover:text-white transition-colors"><i class="fas fa-home w-6"></i> Dashboard</a>
-            <a href="#" onclick="switchSection('agents', this)" class="nav-item flex items-center px-6 py-3 text-gray-300 hover:text-white transition-colors">
-                <i class="fas fa-robot w-6"></i> Agentes
-                <span id="nav-badge-agents" class="ml-auto bg-purple-600/20 text-purple-400 text-xs px-2 py-0.5 rounded-full border border-purple-500/30">0</span>
-            </a>
-            <a href="#" onclick="switchSection('production', this)" class="nav-item flex items-center px-6 py-3 text-gray-300 hover:text-white transition-colors"><i class="fas fa-tasks w-6"></i> Producción</a>
+            <div class="px-4 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Principal</div>
+            <nav class="space-y-1 px-2">
+                <a href="#" onclick="switchSection('dashboard')" id="nav-dashboard" class="nav-item active-nav flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#111118] transition-colors">
+                    <i class="fas fa-home w-5 text-center"></i> Dashboard
+                </a>
+                <a href="#" onclick="switchSection('agents')" id="nav-agents" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#111118] transition-colors">
+                    <i class="fas fa-robot w-5 text-center"></i> Agentes
+                    <span id="badge-agents" class="ml-auto bg-[#1a1a2e] text-xs py-0.5 px-2 rounded-full border border-[#2d2d50]">0</span>
+                </a>
+                <a href="#" onclick="switchSection('production')" id="nav-production" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#111118] transition-colors">
+                    <i class="fas fa-tasks w-5 text-center"></i> Producción
+                </a>
+            </nav>
 
-            <div class="px-6 mt-6 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Analítica</div>
-            <a href="#" onclick="switchSection('studio', this)" class="nav-item flex items-center px-6 py-3 text-gray-300 hover:text-white transition-colors"><i class="fas fa-chart-line w-6"></i> YouTube Studio</a>
-            <a href="#" onclick="switchSection('income', this)" class="nav-item flex items-center px-6 py-3 text-gray-300 hover:text-white transition-colors"><i class="fas fa-dollar-sign w-6"></i> Ingresos</a>
+            <div class="px-4 mt-8 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Analítica</div>
+            <nav class="space-y-1 px-2">
+                <a href="#" onclick="switchSection('studio')" id="nav-studio" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#111118] transition-colors">
+                    <i class="fab fa-youtube w-5 text-center text-red-500"></i> YouTube Studio
+                </a>
+                <a href="#" onclick="switchSection('revenue')" id="nav-revenue" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#111118] transition-colors">
+                    <i class="fas fa-chart-line w-5 text-center text-green-500"></i> Ingresos
+                </a>
+            </nav>
         </div>
 
         <!-- Footer Profile -->
-        <div class="p-4 border-t border-gray-800">
+        <div class="p-4 border-t border-[#1a1a2e] bg-[#0a0a0f]">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
-                    <i class="fas fa-user-tie text-gray-400"></i>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-gray-800 to-gray-700 flex items-center justify-center border border-gray-600">
+                    <i class="fas fa-user-tie text-gray-300"></i>
                 </div>
                 <div>
                     <div class="text-sm font-medium text-white">Administrador</div>
-                    <div class="text-xs text-gray-500">Operator &rarr; Manager</div>
+                    <div class="text-xs text-gray-500">Operator → Manager</div>
                 </div>
             </div>
         </div>
     </aside>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
-        
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
         <!-- TOPBAR -->
-        <header class="h-16 glass-panel border-b-0 border-l-0 border-r-0 flex items-center justify-between px-4 md:px-8 z-10">
+        <header class="glass-panel h-16 flex items-center justify-between px-4 md:px-8 z-30 shrink-0">
             <div class="flex items-center gap-4">
                 <button class="md:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
-                <h2 id="topbar-title" class="text-lg md:text-xl font-semibold">Dashboard Central</h2>
-                <div class="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-green-900/20 border border-green-800/30 text-xs text-green-400">
-                    <div class="w-2 h-2 rounded-full bg-green-500 dot-pulse"></div>
-                    Sistema Activo
+                <h2 id="topbar-title" class="text-lg md:text-xl font-semibold">Dashboard</h2>
+                <div class="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-[#111118] border border-[#1a1a2e]">
+                    <div class="w-2 h-2 bg-green-500 dot-active"></div>
+                    <span class="text-xs text-gray-400">Sistema Activo</span>
                 </div>
             </div>
 
-            <div class="flex items-center gap-4">
-                <div class="hidden lg:flex gap-4 mr-4 text-sm">
-                    <div class="flex flex-col items-center"><span class="text-gray-500 text-xs">Agentes</span><span id="top-count-agents" class="font-bold text-white">0</span></div>
-                    <div class="flex flex-col items-center"><span class="text-gray-500 text-xs">Pendientes</span><span id="top-count-pending" class="font-bold text-orange-400">0</span></div>
-                    <div class="flex flex-col items-center"><span class="text-gray-500 text-xs">Proceso</span><span id="top-count-process" class="font-bold text-blue-400">0</span></div>
-                    <div class="flex flex-col items-center"><span class="text-gray-500 text-xs">Completadas</span><span id="top-count-done" class="font-bold text-green-400">0</span></div>
+            <div class="flex items-center gap-3 md:gap-6">
+                <!-- Stats hidden on mobile -->
+                <div class="hidden md:flex items-center gap-4 text-sm text-gray-400">
+                    <div title="Pendientes"><i class="fas fa-circle text-orange-500 text-[10px] mr-1"></i> <span id="top-stat-pending">0</span></div>
+                    <div title="En Proceso"><i class="fas fa-circle text-blue-500 text-[10px] mr-1"></i> <span id="top-stat-process">0</span></div>
+                    <div title="Completadas"><i class="fas fa-circle text-green-500 text-[10px] mr-1"></i> <span id="top-stat-done">0</span></div>
                 </div>
                 
-                <button id="btn-contextual" onclick="openContextModal()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium text-white shadow-lg flex items-center gap-2 hidden">
-                    <i class="fas fa-plus"></i> <span id="btn-contextual-text">Nuevo</span>
+                <button id="btn-contextual" onclick="openModal('modal-task')" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+                    <i class="fas fa-plus"></i> <span class="hidden md:inline" id="btn-contextual-text">Nueva Tarea</span>
                 </button>
             </div>
         </header>
 
-        <!-- SECTIONS WRAPPER -->
-        <div class="flex-1 overflow-y-auto p-4 md:p-8 relative" id="sections-container">
+        <!-- SCROLLABLE AREA -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-8">
             
-            <!-- SECTION: DASHBOARD -->
-            <section id="sec-dashboard" class="section-content">
+            <!-- 1. DASHBOARD SECTION -->
+            <section id="sec-dashboard" class="space-y-8 animate-fade-in">
                 <!-- Stats Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <div class="card p-5 border-t-2 border-t-purple-500">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Agentes Activos</p>
-                                <h3 id="stat-agents" class="text-3xl font-black mt-1">0</h3>
-                            </div>
-                            <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500 text-xl"><i class="fas fa-robot"></i></div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="glass-card p-5 relative overflow-hidden group">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Agentes Activos</div>
+                            <div class="p-2 bg-purple-500/10 rounded-lg text-purple-500 group-hover:bg-purple-500 group-hover:text-white transition-colors"><i class="fas fa-robot"></i></div>
                         </div>
+                        <div class="text-3xl font-bold mt-2" id="stat-agents">0</div>
+                        <div class="text-xs text-gray-500 mt-1">Automatizando procesos</div>
                     </div>
-                    <div class="card p-5 border-t-2 border-t-orange-500">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Pendientes</p>
-                                <h3 id="stat-pending" class="text-3xl font-black mt-1">0</h3>
-                            </div>
-                            <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500 text-xl"><i class="fas fa-clock"></i></div>
+                    <div class="glass-card p-5 relative overflow-hidden group">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-orange-500"></div>
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Pendientes</div>
+                            <div class="p-2 bg-orange-500/10 rounded-lg text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-colors"><i class="fas fa-inbox"></i></div>
                         </div>
+                        <div class="text-3xl font-bold mt-2" id="stat-pending">0</div>
+                        <div class="text-xs text-gray-500 mt-1">Esperando acción</div>
                     </div>
-                    <div class="card p-5 border-t-2 border-t-blue-500">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">En Proceso</p>
-                                <h3 id="stat-process" class="text-3xl font-black mt-1">0</h3>
-                            </div>
-                            <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 text-xl"><i class="fas fa-spinner fa-spin"></i></div>
+                    <div class="glass-card p-5 relative overflow-hidden group">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">En Proceso</div>
+                            <div class="p-2 bg-blue-500/10 rounded-lg text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-colors"><i class="fas fa-spinner"></i></div>
                         </div>
+                        <div class="text-3xl font-bold mt-2" id="stat-process">0</div>
+                        <div class="text-xs text-gray-500 mt-1">Trabajando ahora</div>
                     </div>
-                    <div class="card p-5 border-t-2 border-t-green-500">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Completadas</p>
-                                <h3 id="stat-done" class="text-3xl font-black mt-1">0</h3>
-                            </div>
-                            <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center text-green-500 text-xl"><i class="fas fa-check-circle"></i></div>
+                    <div class="glass-card p-5 relative overflow-hidden group">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-green-500"></div>
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Completadas</div>
+                            <div class="p-2 bg-green-500/10 rounded-lg text-green-500 group-hover:bg-green-500 group-hover:text-white transition-colors"><i class="fas fa-check-circle"></i></div>
                         </div>
+                        <div class="text-3xl font-bold mt-2" id="stat-done">0</div>
+                        <div class="text-xs text-gray-500 mt-1">Tareas finalizadas</div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- Compact Agents -->
-                    <div class="lg:col-span-1">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-bold">Equipo IA</h3>
-                            <button onclick="switchSection('agents', document.querySelectorAll('.nav-item')[1])" class="text-xs text-purple-400 hover:text-purple-300">Ver todos</button>
+                <!-- Active Agents Quick View -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2"><i class="fas fa-users text-purple-500"></i> Equipo Operativo</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="dash-agents-grid">
+                        <div class="col-span-full text-center py-8 text-gray-500 border border-dashed border-gray-700 rounded-lg">Cargando agentes...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. AGENTS SECTION -->
+            <section id="sec-agents" class="hide space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="agents-grid">
+                    <!-- Dinámico -->
+                </div>
+            </section>
+
+            <!-- 3. PRODUCTION SECTION (KANBAN) -->
+            <section id="sec-production" class="hide h-[calc(100vh-140px)]">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
+                    <!-- Column: Pending -->
+                    <div class="flex flex-col bg-[#060609] border border-[#1a1a2e] rounded-xl overflow-hidden">
+                        <div class="p-3 border-b border-[#1a1a2e] bg-[#0a0a0f] flex justify-between items-center">
+                            <div class="flex items-center gap-2 font-semibold">
+                                <div class="w-2.5 h-2.5 rounded-full bg-orange-500"></div> Pendientes
+                            </div>
+                            <span class="bg-[#111118] text-gray-400 text-xs py-1 px-2 rounded border border-[#1a1a2e]" id="count-pending">0</span>
                         </div>
-                        <div id="dash-agents-grid" class="flex flex-col gap-3">
-                            <div class="text-center py-8 text-gray-500 text-sm">Cargando agentes...</div>
+                        <div class="p-3 flex-1 overflow-y-auto space-y-3 kanban-column" id="kb-pending" ondragover="allowDrop(event)" ondrop="drop(event, 'pending')">
+                            <!-- Cards -->
                         </div>
                     </div>
 
-                    <!-- Mini Kanban -->
-                    <div class="lg:col-span-2">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-bold">Producción Reciente</h3>
-                            <button onclick="switchSection('production', document.querySelectorAll('.nav-item')[2])" class="text-xs text-purple-400 hover:text-purple-300">Ir al Kanban</button>
+                    <!-- Column: Process -->
+                    <div class="flex flex-col bg-[#060609] border border-[#1a1a2e] rounded-xl overflow-hidden">
+                        <div class="p-3 border-b border-[#1a1a2e] bg-[#0a0a0f] flex justify-between items-center">
+                            <div class="flex items-center gap-2 font-semibold">
+                                <div class="w-2.5 h-2.5 rounded-full bg-blue-500"></div> En Proceso
+                            </div>
+                            <span class="bg-[#111118] text-gray-400 text-xs py-1 px-2 rounded border border-[#1a1a2e]" id="count-process">0</span>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
-                            <div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-3">
-                                <h4 class="text-xs font-bold text-gray-400 uppercase mb-3 flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-orange-500"></div> Pendientes</h4>
-                                <div id="dash-kanban-pending" class="flex flex-col gap-2"></div>
+                        <div class="p-3 flex-1 overflow-y-auto space-y-3 kanban-column" id="kb-process" ondragover="allowDrop(event)" ondrop="drop(event, 'process')">
+                            <!-- Cards -->
+                        </div>
+                    </div>
+
+                    <!-- Column: Done -->
+                    <div class="flex flex-col bg-[#060609] border border-[#1a1a2e] rounded-xl overflow-hidden">
+                        <div class="p-3 border-b border-[#1a1a2e] bg-[#0a0a0f] flex justify-between items-center">
+                            <div class="flex items-center gap-2 font-semibold">
+                                <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div> Completadas
                             </div>
-                            <div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-3">
-                                <h4 class="text-xs font-bold text-gray-400 uppercase mb-3 flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-blue-500"></div> En Proceso</h4>
-                                <div id="dash-kanban-process" class="flex flex-col gap-2"></div>
-                            </div>
-                            <div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-3">
-                                <h4 class="text-xs font-bold text-gray-400 uppercase mb-3 flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-green-500"></div> Completadas</h4>
-                                <div id="dash-kanban-done" class="flex flex-col gap-2"></div>
-                            </div>
+                            <span class="bg-[#111118] text-gray-400 text-xs py-1 px-2 rounded border border-[#1a1a2e]" id="count-done">0</span>
+                        </div>
+                        <div class="p-3 flex-1 overflow-y-auto space-y-3 kanban-column" id="kb-done" ondragover="allowDrop(event)" ondrop="drop(event, 'done')">
+                            <!-- Cards -->
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- SECTION: AGENTES -->
-            <section id="sec-agents" class="section-content hidden">
-                <div class="flex flex-wrap gap-4 mb-6">
-                    <div class="bg-[#111118] border border-gray-800 rounded-lg p-1 flex">
-                        <button class="px-4 py-1.5 text-sm font-medium rounded-md bg-gray-800 text-white">Todos</button>
-                        <button class="px-4 py-1.5 text-sm font-medium rounded-md text-gray-400 hover:text-white">Activos</button>
-                        <button class="px-4 py-1.5 text-sm font-medium rounded-md text-gray-400 hover:text-white">Pausados</button>
+            <!-- 4. YOUTUBE STUDIO SECTION -->
+            <section id="sec-studio" class="hide space-y-6 animate-fade-in">
+                <div class="glass-card p-6 border-l-4 border-l-red-500 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2"><i class="fab fa-youtube text-red-500"></i> YouTube Studio Center</h3>
+                        <p class="text-gray-400 text-sm">Gestiona tu canal, revisa analíticas y sube nuevo contenido directamente desde el panel oficial.</p>
                     </div>
+                    <a href="https://studio.youtube.com" target="_blank" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap flex items-center gap-2">
+                        Abrir Studio <i class="fas fa-external-link-alt text-sm"></i>
+                    </a>
                 </div>
-                
-                <div id="full-agents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    <!-- Cards de agentes generadas por JS -->
-                    <div class="col-span-full text-center py-12 text-gray-500">Cargando agentes...</div>
-                </div>
-            </section>
 
-            <!-- SECTION: PRODUCCIÓN (KANBAN) -->
-            <section id="sec-production" class="section-content hidden h-full">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(100vh-160px)]">
-                    <!-- Columna Pendientes -->
-                    <div class="flex flex-col bg-[#0a0a0f] rounded-xl border border-gray-800 overflow-hidden">
-                        <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-[#111118]">
-                            <h3 class="font-bold flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-orange-500"></div> Pendientes</h3>
-                            <span id="kanban-count-pending" class="text-xs bg-gray-800 px-2 py-1 rounded text-gray-300">0</span>
-                        </div>
-                        <div id="kanban-col-pending" class="kanban-col flex-1 p-3 overflow-y-auto flex flex-col gap-3" ondragover="allowDrop(event)" ondrop="drop(event, 'pending')">
-                            <!-- Tareas -->
-                        </div>
-                    </div>
-
-                    <!-- Columna Proceso -->
-                    <div class="flex flex-col bg-[#0a0a0f] rounded-xl border border-gray-800 overflow-hidden">
-                        <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-[#111118]">
-                            <h3 class="font-bold flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-blue-500"></div> En Proceso</h3>
-                            <span id="kanban-count-process" class="text-xs bg-gray-800 px-2 py-1 rounded text-gray-300">0</span>
-                        </div>
-                        <div id="kanban-col-process" class="kanban-col flex-1 p-3 overflow-y-auto flex flex-col gap-3" ondragover="allowDrop(event)" ondrop="drop(event, 'process')">
-                            <!-- Tareas -->
-                        </div>
-                    </div>
-
-                    <!-- Columna Completadas -->
-                    <div class="flex flex-col bg-[#0a0a0f] rounded-xl border border-gray-800 overflow-hidden">
-                        <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-[#111118]">
-                            <h3 class="font-bold flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-green-500"></div> Completadas</h3>
-                            <span id="kanban-count-done" class="text-xs bg-gray-800 px-2 py-1 rounded text-gray-300">0</span>
-                        </div>
-                        <div id="kanban-col-done" class="kanban-col flex-1 p-3 overflow-y-auto flex flex-col gap-3" ondragover="allowDrop(event)" ondrop="drop(event, 'done')">
-                            <!-- Tareas -->
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- SECTION: YOUTUBE STUDIO -->
-            <section id="sec-studio" class="section-content hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="card p-6 flex flex-col items-center justify-center text-center">
-                        <i class="fab fa-youtube text-6xl text-red-600 mb-4"></i>
-                        <h3 class="text-2xl font-bold mb-2">YouTube Studio</h3>
-                        <p class="text-gray-400 mb-6">Accede a las analíticas reales y gestiona tus canales desde la plataforma oficial.</p>
-                        <a href="https://studio.youtube.com" target="_blank" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow-lg shadow-red-600/20 w-full md:w-auto">
-                            Abrir YouTube Studio <i class="fas fa-external-link-alt ml-2 text-sm"></i>
-                        </a>
-                    </div>
-                    
-                    <div class="card p-6 border-l-4 border-l-blue-500">
-                        <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-chart-pie text-blue-500"></i> Métricas Clave (KPIs)</h3>
-                        <ul class="space-y-4">
-                            <li class="flex items-start gap-3">
-                                <div class="w-8 h-8 rounded bg-gray-800 flex items-center justify-center shrink-0 mt-1"><i class="fas fa-redo text-blue-400"></i></div>
-                                <div>
-                                    <h4 class="font-bold text-white">Rule of Revision</h4>
-                                    <p class="text-sm text-gray-400">Analizar y pivotar la estrategia cada 10 videos subidos.</p>
-                                </div>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <div class="w-8 h-8 rounded bg-gray-800 flex items-center justify-center shrink-0 mt-1"><i class="fas fa-mouse-pointer text-orange-400"></i></div>
-                                <div>
-                                    <h4 class="font-bold text-white">Target CTR</h4>
-                                    <p class="text-sm text-gray-400">Mantener ≥7% después de las primeras 3 horas de publicación.</p>
-                                </div>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <div class="w-8 h-8 rounded bg-gray-800 flex items-center justify-center shrink-0 mt-1"><i class="fas fa-eye text-green-400"></i></div>
-                                <div>
-                                    <h4 class="font-bold text-white">AVD (Retención)</h4>
-                                    <p class="text-sm text-gray-400">Asegurar un 70% en los primeros 30s y 50% al final del video.</p>
-                                </div>
-                            </li>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div class="glass-card p-6">
+                        <h4 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="fas fa-sync text-blue-400"></i> The Rule of Revision</h4>
+                        <p class="text-gray-300 text-sm mb-4">Cada 10 videos publicados, debes detenerte y analizar:</p>
+                        <ul class="space-y-3 text-sm text-gray-400">
+                            <li class="flex gap-2"><i class="fas fa-check text-green-500 mt-1"></i> <span>¿Qué formato retuvo mejor a la audiencia?</span></li>
+                            <li class="flex gap-2"><i class="fas fa-check text-green-500 mt-1"></i> <span>¿Qué miniatura tuvo mayor CTR?</span></li>
+                            <li class="flex gap-2"><i class="fas fa-check text-green-500 mt-1"></i> <span>Aplica los aprendizajes a los siguientes 10 videos.</span></li>
                         </ul>
                     </div>
+                    <div class="glass-card p-6">
+                        <h4 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="fas fa-bullseye text-orange-400"></i> Métricas Objetivo (KPIs)</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span class="text-gray-300">Click-Through Rate (CTR) a las 3h</span> <span class="text-green-400 font-bold">≥ 7%</span></div>
+                                <div class="w-full bg-gray-800 rounded-full h-1.5"><div class="bg-green-500 h-1.5 rounded-full" style="width: 70%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span class="text-gray-300">Average View Duration (AVD)</span> <span class="text-blue-400 font-bold">≥ 40%</span></div>
+                                <div class="w-full bg-gray-800 rounded-full h-1.5"><div class="bg-blue-500 h-1.5 rounded-full" style="width: 40%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span class="text-gray-300">Retención 0:30s (Hook)</span> <span class="text-purple-400 font-bold">≥ 60%</span></div>
+                                <div class="w-full bg-gray-800 rounded-full h-1.5"><div class="bg-purple-500 h-1.5 rounded-full" style="width: 60%"></div></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <!-- SECTION: INGRESOS -->
-            <section id="sec-income" class="section-content hidden">
-                <div class="card p-6 mb-6 bg-gradient-to-r from-[#111118] to-[#1a1a2e]">
-                    <h3 class="text-xl font-bold mb-2">Roadmap a $5K/mes</h3>
-                    <p class="text-gray-400 text-sm mb-4">Estrategia de monetización basada en 100K vistas mensuales combinando múltiples fuentes.</p>
-                    
-                    <div class="h-4 bg-gray-800 rounded-full overflow-hidden flex mb-2">
-                        <div class="h-full bg-green-500" style="width: 20%;" title="Ads: $1K"></div>
-                        <div class="h-full bg-blue-500" style="width: 10%;" title="Brands: $500"></div>
-                        <div class="h-full bg-purple-500" style="width: 50%;" title="Products: $2.5K"></div>
-                        <div class="h-full bg-orange-500" style="width: 20%;" title="Affiliates: $1K"></div>
-                    </div>
-                    <div class="flex justify-between text-xs font-bold">
-                        <span class="text-green-500">Ads $1K</span>
-                        <span class="text-blue-500">Brands $0.5K</span>
-                        <span class="text-purple-500">Products $2.5K</span>
-                        <span class="text-orange-500">Affiliates $1K</span>
+            <!-- 5. REVENUE SECTION -->
+            <section id="sec-revenue" class="hide space-y-6 animate-fade-in">
+                <div class="glass-card p-6">
+                    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fas fa-route text-green-500"></i> Roadmap to $5K/mes</h3>
+                    <div class="relative pt-8 pb-4 px-4">
+                        <div class="absolute top-10 left-4 right-4 h-1 bg-gray-800 rounded-full"></div>
+                        <div class="absolute top-10 left-4 h-1 bg-green-500 rounded-full transition-all duration-1000" style="width: 25%"></div>
+                        
+                        <div class="flex justify-between relative z-10">
+                            <div class="flex flex-col items-center">
+                                <div class="w-4 h-4 rounded-full bg-green-500 ring-4 ring-black mb-2"></div>
+                                <div class="text-xs font-bold text-green-400">$0</div>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="w-4 h-4 rounded-full bg-green-500 ring-4 ring-black mb-2"></div>
+                                <div class="text-xs font-bold text-gray-300">$1K</div>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="w-4 h-4 rounded-full bg-gray-600 ring-4 ring-black mb-2"></div>
+                                <div class="text-xs font-bold text-gray-500">$2.5K</div>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="w-4 h-4 rounded-full bg-gray-600 ring-4 ring-black mb-2"></div>
+                                <div class="text-xs font-bold text-gray-500">$5K</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                    <div class="card p-5 border-t-2 border-t-orange-500">
-                        <div class="text-2xl mb-2">1️⃣</div>
-                        <h4 class="font-bold mb-1">Afiliados</h4>
-                        <p class="text-xs text-gray-400 mb-3">Requisito: 0-1K subs</p>
-                        <p class="text-sm">Links de Amazon, software y herramientas en la descripción.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="glass-card p-5 border-t-4 border-t-gray-500 opacity-80">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold">1. Affiliates</h4>
+                            <span class="text-xs bg-gray-800 px-2 py-1 rounded text-gray-400">0 - 1K Subs</span>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-3">Links de Amazon, software, herramientas en la descripción.</p>
+                        <div class="text-xs text-gray-500 font-mono">Meta: $100/mes</div>
                     </div>
-                    <div class="card p-5 border-t-2 border-t-green-500 opacity-80">
-                        <div class="text-2xl mb-2">2️⃣</div>
-                        <h4 class="font-bold mb-1">Ad Revenue</h4>
-                        <p class="text-xs text-gray-400 mb-3">Requisito: 1K+ subs, 4K horas</p>
-                        <p class="text-sm">Programa de Partners de YouTube. Ingresos pasivos por vistas.</p>
+                    <div class="glass-card p-5 border-t-4 border-t-blue-500">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold">2. Ad Revenue</h4>
+                            <span class="text-xs bg-blue-900/30 text-blue-400 px-2 py-1 rounded">1K+ Subs</span>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-3">Programa de Partners de YouTube. Optimizar RPM.</p>
+                        <div class="text-xs text-gray-500 font-mono">Meta: $1,000/mes</div>
                     </div>
-                    <div class="card p-5 border-t-2 border-t-blue-500 opacity-60">
-                        <div class="text-2xl mb-2">3️⃣</div>
-                        <h4 class="font-bold mb-1">Brand Deals</h4>
-                        <p class="text-xs text-gray-400 mb-3">Requisito: 5K+ subs</p>
-                        <p class="text-sm">Patrocinios integrados en videos de 60 segundos.</p>
+                    <div class="glass-card p-5 border-t-4 border-t-purple-500">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold">3. Brand Deals</h4>
+                            <span class="text-xs bg-purple-900/30 text-purple-400 px-2 py-1 rounded">5K+ Subs</span>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-3">Patrocinios directos. Cobra $20-30 por cada 1,000 vistas promedio.</p>
+                        <div class="text-xs text-gray-500 font-mono">Meta: $500/mes</div>
                     </div>
-                    <div class="card p-5 border-t-2 border-t-purple-500 opacity-40">
-                        <div class="text-2xl mb-2">4️⃣</div>
-                        <h4 class="font-bold mb-1">Productos</h4>
-                        <p class="text-xs text-gray-400 mb-3">Requisito: Audiencia leal</p>
-                        <p class="text-sm">Cursos, plantillas, mercancía digital propia.</p>
+                    <div class="glass-card p-5 border-t-4 border-t-orange-500">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold">4. Digital Products</h4>
+                            <span class="text-xs bg-orange-900/30 text-orange-400 px-2 py-1 rounded">5K+ Subs</span>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-3">Cursos, plantillas, e-books. El mayor margen de ganancia.</p>
+                        <div class="text-xs text-gray-500 font-mono">Meta: $2,500/mes</div>
                     </div>
-                    <div class="card p-5 border-t-2 border-t-pink-500 opacity-40">
-                        <div class="text-2xl mb-2">5️⃣</div>
-                        <h4 class="font-bold mb-1">Exclusivo</h4>
-                        <p class="text-xs text-gray-400 mb-3">Requisito: Comunidad activa</p>
-                        <p class="text-sm">Patreon, Miembros del canal, Discord VIP.</p>
+                    <div class="glass-card p-5 border-t-4 border-t-pink-500">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold">5. Communities</h4>
+                            <span class="text-xs bg-pink-900/30 text-pink-400 px-2 py-1 rounded">10K+ Subs</span>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-3">Patreon, Skool, Discord VIP. Ingresos recurrentes mensuales.</p>
+                        <div class="text-xs text-gray-500 font-mono">Meta: $1,000/mes</div>
                     </div>
                 </div>
             </section>
@@ -532,651 +441,577 @@
     </main>
 
     <!-- MODAL: CREAR AGENTE -->
-    <div id="modal-agent" class="modal">
-        <div class="modal-content w-full max-w-md rounded-xl p-6 relative">
-            <button onclick="closeModal('modal-agent')" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
-            <h2 class="text-xl font-bold mb-4">Nuevo Agente IA</h2>
-            
-            <form id="form-agent" onsubmit="handleCreateAgent(event)" class="space-y-4">
+    <div id="modal-agent" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-[#0a0a0f] border border-[#1a1a2e] rounded-xl w-full max-w-md modal-animate overflow-hidden">
+            <div class="p-4 border-b border-[#1a1a2e] flex justify-between items-center">
+                <h3 class="font-bold text-lg">Crear Nuevo Agente</h3>
+                <button onclick="closeModal('modal-agent')" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="form-agent" class="p-5 space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Nombre del Agente *</label>
-                    <input type="text" id="ag-name" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-purple-500" placeholder="Ej: Editor Shorts">
+                    <label class="block text-xs text-gray-400 mb-1">Nombre del Agente *</label>
+                    <input type="text" id="agent-name" required class="form-input" placeholder="Ej: Editor Pro, Buscador">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Descripción</label>
-                    <input type="text" id="ag-sub" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-purple-500" placeholder="Rol principal">
+                    <label class="block text-xs text-gray-400 mb-1">Rol / Descripción</label>
+                    <input type="text" id="agent-sub" class="form-input" placeholder="Ej: Crea guiones virales">
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Sistema</label>
-                        <select id="ag-system" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-purple-500 appearance-none">
-                            <option value="ambos">🔄 Ambos</option>
-                            <option value="tube">🎬 Tube Automate</option>
-                            <option value="shorts">⚡ Shorts System</option>
-                        </select>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Sistema Asignado</label>
+                    <select id="agent-system" class="form-input">
+                        <option value="ambos">🔄 Ambos Sistemas</option>
+                        <option value="tube">🎬 Tube Automate</option>
+                        <option value="shorts">⚡ Shorts System</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-2">Color de Identidad</label>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="selectColor(this, 'col-purple')" class="color-btn w-8 h-8 rounded-full bg-purple-500 ring-2 ring-white ring-offset-2 ring-offset-[#0a0a0f]"></button>
+                        <button type="button" onclick="selectColor(this, 'col-blue')" class="color-btn w-8 h-8 rounded-full bg-blue-500"></button>
+                        <button type="button" onclick="selectColor(this, 'col-green')" class="color-btn w-8 h-8 rounded-full bg-green-500"></button>
+                        <button type="button" onclick="selectColor(this, 'col-orange')" class="color-btn w-8 h-8 rounded-full bg-orange-500"></button>
+                        <button type="button" onclick="selectColor(this, 'col-pink')" class="color-btn w-8 h-8 rounded-full bg-pink-500"></button>
+                        <button type="button" onclick="selectColor(this, 'col-yellow')" class="color-btn w-8 h-8 rounded-full bg-yellow-500"></button>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Color</label>
-                        <div class="flex gap-2 mt-1">
-                            <div class="color-option w-6 h-6 rounded-full bg-orange-500 cursor-pointer selected" data-col="col-orange" onclick="selectColor(this)"></div>
-                            <div class="color-option w-6 h-6 rounded-full bg-purple-500 cursor-pointer" data-col="col-purple" onclick="selectColor(this)"></div>
-                            <div class="color-option w-6 h-6 rounded-full bg-blue-500 cursor-pointer" data-col="col-blue" onclick="selectColor(this)"></div>
-                            <div class="color-option w-6 h-6 rounded-full bg-green-500 cursor-pointer" data-col="col-green" onclick="selectColor(this)"></div>
-                            <div class="color-option w-6 h-6 rounded-full bg-pink-500 cursor-pointer" data-col="col-pink" onclick="selectColor(this)"></div>
-                            <div class="color-option w-6 h-6 rounded-full bg-yellow-500 cursor-pointer" data-col="col-yellow" onclick="selectColor(this)"></div>
-                        </div>
-                        <input type="hidden" id="ag-color" value="col-orange">
-                    </div>
+                    <input type="hidden" id="agent-color" value="col-purple">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Webhook URL (n8n)</label>
-                    <input type="url" id="ag-n8n" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-purple-500" placeholder="https://...">
-                </div>
-                
-                <div class="pt-4 flex justify-end gap-3">
-                    <button type="button" onclick="closeModal('modal-agent')" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-800">Cancelar</button>
-                    <button type="submit" id="btn-save-agent" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2">
-                        Guardar Agente
-                    </button>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeModal('modal-agent')" class="flex-1 px-4 py-2 rounded-lg border border-[#2d2d50] hover:bg-[#111118] transition-colors">Cancelar</button>
+                    <button type="submit" class="flex-1 btn-primary rounded-lg font-medium" id="btn-save-agent">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- MODAL: CREAR TAREA -->
-    <div id="modal-task" class="modal">
-        <div class="modal-content w-full max-w-md rounded-xl p-6 relative">
-            <button onclick="closeModal('modal-task')" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
-            <h2 class="text-xl font-bold mb-4">Nueva Tarea</h2>
-            
-            <form id="form-task" onsubmit="handleCreateTask(event)" class="space-y-4">
+    <div id="modal-task" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-[#0a0a0f] border border-[#1a1a2e] rounded-xl w-full max-w-md modal-animate overflow-hidden">
+            <div class="p-4 border-b border-[#1a1a2e] flex justify-between items-center">
+                <h3 class="font-bold text-lg">Nueva Tarea</h3>
+                <button onclick="closeModal('modal-task')" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="form-task" class="p-5 space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Título *</label>
-                    <input type="text" id="tk-title" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-purple-500">
+                    <label class="block text-xs text-gray-400 mb-1">Título de la Tarea *</label>
+                    <input type="text" id="task-title" required class="form-input" placeholder="Ej: Editar video top 10">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Descripción</label>
-                    <textarea id="tk-desc" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-purple-500"></textarea>
+                    <label class="block text-xs text-gray-400 mb-1">Descripción</label>
+                    <textarea id="task-desc" rows="3" class="form-input resize-none" placeholder="Detalles de lo que hay que hacer..."></textarea>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Asignar a Agente</label>
-                    <select id="tk-agent" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-purple-500 appearance-none">
-                        <option value="">Sin asignar (Global)</option>
-                        <!-- Options generated by JS -->
+                    <label class="block text-xs text-gray-400 mb-1">Asignar a Agente</label>
+                    <select id="task-agent" class="form-input">
+                        <option value="">Sin asignar (Manual)</option>
+                        <!-- Dynamic options via JS -->
                     </select>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Estado Inicial</label>
-                    <select id="tk-status" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-purple-500 appearance-none">
-                        <option value="pending">Pendiente</option>
-                        <option value="process">En Proceso</option>
-                        <option value="done">Completada</option>
-                    </select>
-                </div>
-                
-                <div class="pt-4 flex justify-end gap-3">
-                    <button type="button" onclick="closeModal('modal-task')" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-800">Cancelar</button>
-                    <button type="submit" id="btn-save-task" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium text-white">
-                        Crear Tarea
-                    </button>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeModal('modal-task')" class="flex-1 px-4 py-2 rounded-lg border border-[#2d2d50] hover:bg-[#111118] transition-colors">Cancelar</button>
+                    <button type="submit" class="flex-1 btn-primary rounded-lg font-medium" id="btn-save-task">Crear Tarea</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- TOAST CONTAINER -->
-    <div id="toast-container"></div>
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
 
     <script>
-        // === CONFIGURACIÓN SUPABASE ===
+        // ==========================================
+        // 1. CONFIGURACIÓN SUPABASE
+        // ==========================================
         const SUPA_URL = "https://tmtigikluepahdynifgo.supabase.co";
         const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtdGlnaWtsdWVwYWhkeW5pZmdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNjI4MTYsImV4cCI6MjA5MDczODgxNn0.p5GjDSBDyUGVEw0kP749Ho1MPX3blnachpqVHwu3ll4";
-        
-        const headers = {
-            'apikey': SUPA_KEY,
-            'Authorization': `Bearer ${SUPA_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=representation' // CRÍTICO: Obliga a Supabase a devolver el objeto modificado/creado
-        };
 
-        // === ESTADO GLOBAL ===
         let agents = [];
         let tasks = [];
         let currentSection = 'dashboard';
 
-        // === INICIALIZACIÓN ===
-        document.addEventListener('DOMContentLoaded', () => {
-            initApp();
-            // Auto refresh cada 30s
-            setInterval(() => { fetchAgents(); fetchTasks(); }, 30000);
-        });
+        // ==========================================
+        // 2. FETCH API (LA SOLUCIÓN AL ERROR)
+        // ==========================================
+        async function fetchAPI(endpoint, method = 'GET', body = null) {
+            const headers = {
+                'apikey': SUPA_KEY,
+                'Authorization': `Bearer ${SUPA_KEY}`,
+                'Content-Type': 'application/json',
+                // ESTA CABECERA ES VITAL PARA QUE DEVUELVA DATOS AL CREAR
+                'Prefer': 'return=representation'
+            };
 
-        async function initApp() {
-            switchSection('dashboard', document.querySelector('.nav-item.active'));
-            await fetchAgents();
-            await fetchTasks();
+            const options = { method, headers };
+
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+
+            try {
+                const res = await fetch(`${SUPA_URL}/rest/v1/${endpoint}`, options);
+                
+                // Si la respuesta no es OK (ej. 400 Bad Request)
+                if (!res.ok) {
+                    const errorText = await res.text();
+                    let errorMessage = `Error ${res.status}`;
+                    try {
+                        const errObj = JSON.parse(errorText);
+                        errorMessage = errObj.message || errObj.details || errorMessage;
+                    } catch(e) {}
+                    
+                    console.error("Supabase Error Detallado:", errorMessage);
+                    throw new Error(errorMessage);
+                }
+
+                if (res.status === 204) return true; // Para DELETEs que no devuelven body
+                
+                const data = await res.json();
+                return data;
+            } catch (error) {
+                console.error("Fetch API Error:", error);
+                showToast(`Error BD: ${error.message}`, 'error');
+                return null;
+            }
         }
 
-        // === NOTIFICACIONES (TOAST) ===
-        function showToast(message, type = 'success') {
+        // ==========================================
+        // 3. UI & NAVEGACIÓN
+        // ==========================================
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hide');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hide');
+            }
+        }
+
+        function switchSection(section) {
+            currentSection = section;
+            // Ocultar todas
+            ['sec-dashboard', 'sec-agents', 'sec-production', 'sec-studio', 'sec-revenue'].forEach(id => {
+                document.getElementById(id).classList.add('hide');
+            });
+            // Mostrar actual
+            document.getElementById(`sec-${section}`).classList.remove('hide');
+            
+            // Actualizar Nav
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active-nav');
+                el.classList.add('text-gray-400');
+                el.classList.remove('text-white');
+            });
+            const activeNav = document.getElementById(`nav-${section}`);
+            if(activeNav) {
+                activeNav.classList.add('active-nav', 'text-white');
+                activeNav.classList.remove('text-gray-400');
+            }
+
+            // Actualizar Topbar Título y Botón
+            const titles = {
+                'dashboard': 'Dashboard General',
+                'agents': 'Gestión de Agentes',
+                'production': 'Kanban de Producción',
+                'studio': 'YouTube Studio Center',
+                'revenue': 'Estrategia de Ingresos'
+            };
+            document.getElementById('topbar-title').innerText = titles[section] || 'ZenvioGQ';
+
+            const btnCtx = document.getElementById('btn-contextual');
+            if (section === 'agents') {
+                btnCtx.classList.remove('hide');
+                btnCtx.onclick = () => openModal('modal-agent');
+                document.getElementById('btn-contextual-text').innerText = 'Nuevo Agente';
+            } else if (section === 'production' || section === 'dashboard') {
+                btnCtx.classList.remove('hide');
+                btnCtx.onclick = () => openModal('modal-task');
+                document.getElementById('btn-contextual-text').innerText = 'Nueva Tarea';
+            } else {
+                btnCtx.classList.add('hide');
+            }
+
+            // Close sidebar on mobile
+            if(window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('mobile-overlay').classList.add('hide');
+            }
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+        
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            if(id === 'modal-agent') document.getElementById('form-agent').reset();
+            if(id === 'modal-task') document.getElementById('form-task').reset();
+        }
+
+        function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
             
-            let icon = 'check-circle';
-            if (type === 'error') icon = 'exclamation-circle';
-            if (type === 'info') icon = 'info-circle';
-
-            toast.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+            let bg = 'bg-blue-600';
+            let icon = 'fa-info-circle';
+            if(type === 'success') { bg = 'bg-green-600'; icon = 'fa-check-circle'; }
+            if(type === 'error') { bg = 'bg-red-600'; icon = 'fa-exclamation-circle'; }
+            
+            toast.className = `${bg} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 text-sm transform transition-all duration-300 translate-y-10 opacity-0`;
+            toast.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
+            
             container.appendChild(toast);
-
+            
             setTimeout(() => {
-                toast.style.animation = 'fadeOut 0.3s ease-out forwards';
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            }, 10);
+            
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
 
-        // === UI & NAVEGACIÓN ===
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('sidebar-overlay').classList.toggle('active');
-        }
-
-        function switchSection(sectionId, navElement = null) {
-            currentSection = sectionId;
-            
-            // Ocultar todas las secciones
-            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
-            
-            // Mostrar la seleccionada
-            document.getElementById(`sec-${sectionId}`).classList.remove('hidden');
-
-            // Actualizar Nav visualmente
-            if (navElement) {
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                navElement.classList.add('active');
-                if (window.innerWidth <= 768) toggleSidebar();
-            }
-
-            // Actualizar Topbar y Botón Contextual
-            const titleEl = document.getElementById('topbar-title');
-            const btnCtx = document.getElementById('btn-contextual');
-            const btnText = document.getElementById('btn-contextual-text');
-
-            btnCtx.classList.remove('hidden');
-
-            switch(sectionId) {
-                case 'dashboard':
-                    titleEl.innerText = 'Dashboard Central';
-                    btnCtx.classList.add('hidden');
-                    renderDashboard();
-                    break;
-                case 'agents':
-                    titleEl.innerText = 'Gestión de Agentes IA';
-                    btnText.innerText = 'Nuevo Agente';
-                    btnCtx.onclick = () => openModal('modal-agent');
-                    renderAgentsGrid();
-                    break;
-                case 'production':
-                    titleEl.innerText = 'Producción Kanban';
-                    btnText.innerText = 'Nueva Tarea';
-                    btnCtx.onclick = () => { populateTaskAgentSelect(); openModal('modal-task'); };
-                    renderKanban();
-                    break;
-                case 'studio':
-                    titleEl.innerText = 'YouTube Studio';
-                    btnCtx.classList.add('hidden');
-                    break;
-                case 'income':
-                    titleEl.innerText = 'Monetización e Ingresos';
-                    btnCtx.classList.add('hidden');
-                    break;
-            }
-        }
-
-        // === MODALES ===
-        function openModal(id) {
-            document.getElementById(id).classList.add('active');
-        }
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
-            if(id === 'modal-agent') document.getElementById('form-agent').reset();
-            if(id === 'modal-task') document.getElementById('form-task').reset();
-        }
-        function openContextModal() {
-            if (currentSection === 'agents') openModal('modal-agent');
-            if (currentSection === 'production') {
-                populateTaskAgentSelect();
-                openModal('modal-task');
-            }
-        }
-
-        function selectColor(el) {
-            document.querySelectorAll('.color-option').forEach(c => c.classList.remove('selected'));
-            el.classList.add('selected');
-            document.getElementById('ag-color').value = el.dataset.col;
-        }
-
-        function populateTaskAgentSelect() {
-            const select = document.getElementById('tk-agent');
-            select.innerHTML = '<option value="">Sin asignar (Global)</option>';
-            agents.forEach(ag => {
-                if(ag.status === 'active') {
-                    select.innerHTML += `<option value="${ag.id}">${ag.icon} ${ag.name}</option>`;
-                }
+        function selectColor(btn, colorClass) {
+            document.querySelectorAll('.color-btn').forEach(b => {
+                b.classList.remove('ring-2', 'ring-white', 'ring-offset-2', 'ring-offset-[#0a0a0f]');
             });
+            btn.classList.add('ring-2', 'ring-white', 'ring-offset-2', 'ring-offset-[#0a0a0f]');
+            document.getElementById('agent-color').value = colorClass;
         }
 
-        // === HELPER ICONOS ===
+        // ==========================================
+        // 4. LÓGICA DE AGENTES
+        // ==========================================
         function getIconForName(name) {
             const n = name.toLowerCase();
-            if(n.includes('director') || n.includes('ceo')) return '👑';
-            if(n.includes('busca') || n.includes('idea') || n.includes('research')) return '🔍';
-            if(n.includes('guion') || n.includes('script') || n.includes('copy')) return '✍️';
-            if(n.includes('voz') || n.includes('voice') || n.includes('audio')) return '🎙️';
-            if(n.includes('visual') || n.includes('miniatura') || n.includes('thumb')) return '🎨';
+            if(n.includes('director')) return '👑';
+            if(n.includes('busca') || n.includes('idea')) return '🔍';
+            if(n.includes('guion') || n.includes('script')) return '✍️';
+            if(n.includes('voz') || n.includes('voice')) return '🎙️';
             if(n.includes('edit') || n.includes('video')) return '🎬';
-            if(n.includes('public') || n.includes('upload')) return '📤';
-            if(n.includes('anali') || n.includes('seo') || n.includes('data')) return '📊';
+            if(n.includes('arte') || n.includes('visual')) return '🎨';
+            if(n.includes('public')) return '📤';
+            if(n.includes('anali')) return '📊';
             return '🤖';
         }
 
-        function getSystemBadge(sys) {
-            if (sys === 'tube') return `<span class="text-[10px] font-bold px-2 py-0.5 rounded border bg-red-900/20 text-red-400 border-red-500/20">🎬 Tube</span>`;
-            if (sys === 'shorts') return `<span class="text-[10px] font-bold px-2 py-0.5 rounded border bg-cyan-900/20 text-cyan-400 border-cyan-500/20">⚡ Shorts</span>`;
-            return `<span class="text-[10px] font-bold px-2 py-0.5 rounded border bg-purple-900/20 text-purple-400 border-purple-500/20">🔄 Ambos</span>`;
-        }
-
-        // === API SUPABASE ===
-        async function fetchAgents() {
-            try {
-                const res = await fetch(`${SUPA_URL}/rest/v1/agents?select=*&order=created_at.desc`, { headers });
-                if (!res.ok) throw new Error('Error al obtener agentes. Comprueba RLS.');
-                agents = await res.json();
-                updateUI();
-            } catch (err) {
-                console.error(err);
-                showToast(err.message, 'error');
-            }
-        }
-
-        async function fetchTasks() {
-            try {
-                const res = await fetch(`${SUPA_URL}/rest/v1/tasks?select=*&order=created_at.desc`, { headers });
-                if (!res.ok) throw new Error('Error al obtener tareas. Comprueba RLS.');
-                tasks = await res.json();
-                updateUI();
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        async function handleCreateAgent(e) {
+        document.getElementById('form-agent').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-save-agent');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
             btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-            const name = document.getElementById('ag-name').value;
-            const data = {
+            const name = document.getElementById('agent-name').value;
+            const payload = {
                 name: name,
-                sub: document.getElementById('ag-sub').value,
-                system: document.getElementById('ag-system').value,
-                color: document.getElementById('ag-color').value,
-                n8n_url: document.getElementById('ag-n8n').value,
-                icon: getIconForName(name)
+                sub: document.getElementById('agent-sub').value,
+                system: document.getElementById('agent-system').value,
+                color: document.getElementById('agent-color').value,
+                icon: getIconForName(name),
+                status: 'active'
             };
 
-            try {
-                const res = await fetch(`${SUPA_URL}/rest/v1/agents`, {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify(data)
-                });
-                
-                if(!res.ok) throw new Error("Error al guardar en BD. Apaga el RLS.");
-                
-                const newAgent = await res.json();
-                if(newAgent && newAgent.length > 0) {
-                    agents.unshift(newAgent[0]); // Añadir al inicio localmente
-                } else {
-                    await fetchAgents(); // Fallback
-                }
-                
-                showToast('Agente creado exitosamente');
+            const data = await fetchAPI('agents', 'POST', payload);
+            if (data && data.length > 0) {
+                showToast('Agente creado correctamente', 'success');
                 closeModal('modal-agent');
-                updateUI();
-            } catch (err) {
-                showToast(err.message, 'error');
-            } finally {
-                btn.innerHTML = 'Guardar Agente';
-                btn.disabled = false;
+                await loadAgents();
+            }
+            btn.disabled = false;
+            btn.innerHTML = 'Guardar';
+        });
+
+        async function loadAgents() {
+            const data = await fetchAPI('agents?order=created_at.desc');
+            if (data) {
+                agents = data;
+                renderAgents();
+                updateTaskAgentSelect();
             }
         }
 
-        async function handleCreateTask(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btn-save-task');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
-            btn.disabled = true;
+        function renderAgents() {
+            // Contadores
+            const activeCount = agents.filter(a => a.status === 'active').length;
+            document.getElementById('badge-agents').innerText = agents.length;
+            document.getElementById('stat-agents').innerText = activeCount;
 
-            const agentId = document.getElementById('tk-agent').value;
-            const data = {
-                title: document.getElementById('tk-title').value,
-                description: document.getElementById('tk-desc').value,
-                status: document.getElementById('tk-status').value,
-                agent: agentId || null
-            };
-
-            try {
-                const res = await fetch(`${SUPA_URL}/rest/v1/tasks`, {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify(data)
-                });
-                
-                if(!res.ok) throw new Error("Error al guardar tarea. Apaga el RLS.");
-                
-                const newTask = await res.json();
-                if(newTask && newTask.length > 0) {
-                    tasks.unshift(newTask[0]);
-                } else {
-                    await fetchTasks();
-                }
-
-                showToast('Tarea creada');
-                closeModal('modal-task');
-                updateUI();
-            } catch (err) {
-                showToast(err.message, 'error');
-            } finally {
-                btn.innerHTML = 'Crear Tarea';
-                btn.disabled = false;
-            }
-        }
-
-        async function toggleAgentStatus(id, currentStatus) {
-            const newStatus = currentStatus === 'active' ? 'paused' : 'active';
-            try {
-                const res = await fetch(`${SUPA_URL}/rest/v1/agents?id=eq.${id}`, {
-                    method: 'PATCH',
-                    headers,
-                    body: JSON.stringify({ status: newStatus })
-                });
-                if(!res.ok) throw new Error("Error actualizando estado");
-                
-                const updated = await res.json();
-                if(updated && updated.length > 0) {
-                    const idx = agents.findIndex(a => a.id === id);
-                    if(idx > -1) agents[idx] = updated[0];
-                } else {
-                    await fetchAgents();
-                }
-                updateUI();
-                showToast(`Agente ${newStatus === 'active' ? 'activado' : 'pausado'}`, 'info');
-            } catch (err) {
-                showToast(err.message, 'error');
-            }
-        }
-
-        async function deleteAgent(id) {
-            if(!confirm('¿Eliminar este agente? Se perderán sus tareas asociadas.')) return;
-            try {
-                const res = await fetch(`${SUPA_URL}/rest/v1/agents?id=eq.${id}`, {
-                    method: 'DELETE',
-                    headers
-                });
-                if(!res.ok) throw new Error("Error eliminando agente");
-                
-                agents = agents.filter(a => a.id !== id);
-                tasks = tasks.filter(t => t.agent !== id);
-                updateUI();
-                showToast('Agente eliminado', 'error');
-            } catch (err) {
-                showToast(err.message, 'error');
-            }
-        }
-
-        async function deleteTask(id) {
-            if(!confirm('¿Eliminar tarea?')) return;
-            try {
-                const res = await fetch(`${SUPA_URL}/rest/v1/tasks?id=eq.${id}`, {
-                    method: 'DELETE',
-                    headers
-                });
-                if(!res.ok) throw new Error("Error eliminando");
-                tasks = tasks.filter(t => t.id !== id);
-                updateUI();
-                showToast('Tarea eliminada', 'error');
-            } catch(err) {
-                showToast(err.message, 'error');
-            }
-        }
-
-        // === DRAG & DROP KANBAN ===
-        function drag(ev) {
-            ev.dataTransfer.setData("text", ev.target.id);
-            ev.target.style.opacity = '0.5';
-        }
-
-        function allowDrop(ev) {
-            ev.preventDefault();
-            ev.currentTarget.classList.add('drag-over');
-        }
-
-        async function drop(ev, newStatus) {
-            ev.preventDefault();
-            const cols = document.querySelectorAll('.kanban-col');
-            cols.forEach(c => c.classList.remove('drag-over'));
-
-            const taskIdStr = ev.dataTransfer.getData("text");
-            if(!taskIdStr) return;
-            
-            const el = document.getElementById(taskIdStr);
-            if(el) el.style.opacity = '1';
-            
-            const id = taskIdStr.replace('task-', '');
-            const task = tasks.find(t => t.id === id);
-            if(!task || task.status === newStatus) return;
-
-            // Optimistic update
-            task.status = newStatus;
-            updateUI();
-
-            try {
-                await fetch(`${SUPA_URL}/rest/v1/tasks?id=eq.${id}`, {
-                    method: 'PATCH',
-                    headers,
-                    body: JSON.stringify({ status: newStatus })
-                });
-            } catch(err) {
-                showToast("Error moviendo tarea", "error");
-                fetchTasks(); // revert
-            }
-        }
-
-        // === RENDERIZADO UI ===
-        function updateUI() {
-            updateCounters();
-            if(currentSection === 'dashboard') renderDashboard();
-            if(currentSection === 'agents') renderAgentsGrid();
-            if(currentSection === 'production') renderKanban();
-        }
-
-        function updateCounters() {
-            const activeAgents = agents.filter(a => a.status === 'active').length;
-            const pending = tasks.filter(t => t.status === 'pending').length;
-            const process = tasks.filter(t => t.status === 'process').length;
-            const done = tasks.filter(t => t.status === 'done').length;
-
-            // Topbar
-            document.getElementById('top-count-agents').innerText = activeAgents;
-            document.getElementById('top-count-pending').innerText = pending;
-            document.getElementById('top-count-process').innerText = process;
-            document.getElementById('top-count-done').innerText = done;
-            
-            // Sidebar badge
-            document.getElementById('nav-badge-agents').innerText = activeAgents;
-
-            // Stats Dashboard
-            if(document.getElementById('stat-agents')) {
-                document.getElementById('stat-agents').innerText = activeAgents;
-                document.getElementById('stat-pending').innerText = pending;
-                document.getElementById('stat-process').innerText = process;
-                document.getElementById('stat-done').innerText = done;
-            }
-
-            // Kanban counts
-            if(document.getElementById('kanban-count-pending')) {
-                document.getElementById('kanban-count-pending').innerText = pending;
-                document.getElementById('kanban-count-process').innerText = process;
-                document.getElementById('kanban-count-done').innerText = done;
-            }
-        }
-
-        function renderDashboard() {
-            // Render mini agents
-            const dashAgents = document.getElementById('dash-agents-grid');
-            if(!dashAgents) return;
-            
-            dashAgents.innerHTML = '';
-            const activeList = agents.filter(a => a.status === 'active').slice(0, 5);
-            
-            if(activeList.length === 0) {
-                dashAgents.innerHTML = '<div class="text-gray-500 text-sm text-center py-4 border border-dashed border-gray-800 rounded">Sin agentes activos</div>';
-            } else {
-                activeList.forEach(ag => {
-                    dashAgents.innerHTML += `
-                        <div class="card p-3 flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg ${ag.color}-icon flex items-center justify-center text-xl shadow-lg">${ag.icon}</div>
-                            <div class="flex-1 min-w-0">
-                                <h4 class="font-bold text-sm truncate text-white">${ag.name}</h4>
-                                <p class="text-xs text-gray-400 truncate">${ag.sub || 'IA Agent'}</p>
-                            </div>
-                            <div class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]"></div>
-                        </div>
-                    `;
-                });
-            }
-
-            // Render mini kanban
-            ['pending', 'process', 'done'].forEach(status => {
-                const col = document.getElementById(`dash-kanban-${status}`);
-                if(!col) return;
-                col.innerHTML = '';
-                const stsTasks = tasks.filter(t => t.status === status).slice(0, 4);
-                
-                if(stsTasks.length === 0) {
-                    col.innerHTML = '<div class="text-[10px] text-gray-600 text-center py-2">Vacío</div>';
-                } else {
-                    stsTasks.forEach(t => {
-                        const ag = agents.find(a => a.id === t.agent);
-                        const agStr = ag ? `<span class="text-[10px] ${ag.color}-tag px-1.5 rounded truncate max-w-[80px]">${ag.icon} ${ag.name}</span>` : '';
-                        col.innerHTML += `
-                            <div class="bg-[#111118] border border-gray-800 rounded p-2 text-xs flex flex-col gap-1">
-                                <span class="font-medium text-gray-200 truncate">${t.title}</span>
-                                ${agStr}
-                            </div>
-                        `;
-                    });
-                }
-            });
-        }
-
-        function renderAgentsGrid() {
-            const grid = document.getElementById('full-agents-grid');
-            if(!grid) return;
+            // Render Grid Completo
+            const grid = document.getElementById('agents-grid');
             grid.innerHTML = '';
+            
+            // Render Dash Mini Grid
+            const dashGrid = document.getElementById('dash-agents-grid');
+            dashGrid.innerHTML = '';
 
-            if(agents.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500">No hay agentes creados. Haz clic en "Nuevo Agente".</div>';
+            if (agents.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-10 text-gray-500">No hay agentes. Crea uno nuevo.</div>';
+                dashGrid.innerHTML = '<div class="col-span-full text-center py-6 text-gray-500 border border-dashed border-gray-700 rounded-lg">Sin agentes</div>';
                 return;
             }
 
             agents.forEach(ag => {
-                const isActive = ag.status === 'active';
-                const dotClass = isActive ? 'bg-green-500 dot-pulse' : 'bg-gray-500';
-                const statusBadge = isActive ? '<span class="text-[10px] text-green-400 font-bold">ACTIVO</span>' : '<span class="text-[10px] text-gray-400 font-bold">PAUSADO</span>';
-                const opClass = isActive ? '' : 'opacity-60 grayscale-[30%]';
+                const isAct = ag.status === 'active';
+                const col = ag.color || 'col-purple';
+                const sysTxt = ag.system === 'tube' ? '🎬 Tube' : ag.system === 'shorts' ? '⚡ Shorts' : '🔄 Ambos';
                 
-                // Tasks count
+                // Tasks for this agent
                 const agTasks = tasks.filter(t => t.agent === ag.id);
-                const p = agTasks.filter(t => t.status==='pending').length;
-                const pr = agTasks.filter(t => t.status==='process').length;
-                const d = agTasks.filter(t => t.status==='done').length;
+                const p = agTasks.filter(t=>t.status==='pending').length;
+                const pr = agTasks.filter(t=>t.status==='process').length;
+                const d = agTasks.filter(t=>t.status==='done').length;
 
+                // Card Completa (Sección Agentes)
                 grid.innerHTML += `
-                    <div class="card ${ag.color}-bar p-5 relative ${opClass}">
-                        <div class="absolute top-4 right-4 flex items-center gap-2">
-                            ${statusBadge}
-                            <div class="w-2 h-2 rounded-full ${dotClass}"></div>
-                        </div>
-                        
-                        <div class="flex items-start gap-4 mb-4 mt-2">
-                            <div class="w-14 h-14 rounded-xl ${ag.color}-icon flex items-center justify-center text-2xl shadow-lg shrink-0">${ag.icon}</div>
-                            <div>
-                                <h3 class="font-bold text-lg text-white leading-tight">${ag.name}</h3>
-                                <p class="text-xs text-gray-400 mb-1">${ag.sub || 'Automatización'}</p>
-                                ${getSystemBadge(ag.system)}
+                    <div class="glass-card relative overflow-hidden flex flex-col">
+                        <div class="absolute bottom-0 left-0 w-full h-1 ${col}-bg opacity-80"></div>
+                        <div class="p-5 flex-1">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="w-12 h-12 rounded-xl ${col}-bg bg-opacity-20 flex items-center justify-center text-2xl border ${col}-border border-opacity-30">
+                                    ${ag.icon || '🤖'}
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs px-2 py-1 rounded ${isAct ? 'bg-green-500/10 text-green-500' : 'bg-gray-500/10 text-gray-500'}">
+                                        ${isAct ? 'Activo' : 'Pausado'}
+                                    </span>
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-bold flex items-center gap-2">
+                                ${ag.name} <div class="w-2 h-2 rounded-full ${isAct ? 'bg-green-500 dot-active' : 'bg-gray-600'}"></div>
+                            </h3>
+                            <p class="text-sm text-gray-400 mt-1 h-10 line-clamp-2">${ag.sub || 'Sin descripción'}</p>
+                            
+                            <div class="mt-4 inline-block px-2 py-1 rounded text-xs ${col}-tag">
+                                ${sysTxt}
+                            </div>
+                            
+                            <div class="mt-5 grid grid-cols-3 gap-2 border-t border-[#1a1a2e] pt-4 text-center">
+                                <div><div class="text-lg font-bold text-gray-300">${p}</div><div class="text-[10px] text-gray-500 uppercase">Pend</div></div>
+                                <div><div class="text-lg font-bold text-gray-300">${pr}</div><div class="text-[10px] text-gray-500 uppercase">Proc</div></div>
+                                <div><div class="text-lg font-bold text-gray-300">${d}</div><div class="text-[10px] text-gray-500 uppercase">Done</div></div>
                             </div>
                         </div>
-
-                        <div class="flex justify-between items-center text-xs bg-[#0a0a0f] rounded-lg p-2 mb-4 border border-gray-800">
-                            <div class="text-center w-1/3"><div class="text-gray-500">Pend</div><div class="font-bold text-orange-400">${p}</div></div>
-                            <div class="text-center w-1/3 border-x border-gray-800"><div class="text-gray-500">Proc</div><div class="font-bold text-blue-400">${pr}</div></div>
-                            <div class="text-center w-1/3"><div class="text-gray-500">Done</div><div class="font-bold text-green-400">${d}</div></div>
-                        </div>
-
-                        <div class="flex gap-2">
-                            <button onclick="toggleAgentStatus('${ag.id}', '${ag.status}')" class="flex-1 bg-gray-800 hover:bg-gray-700 text-white text-xs font-medium py-2 rounded transition-colors">
-                                <i class="fas fa-${isActive ? 'pause' : 'play'} mr-1"></i> ${isActive ? 'Pausar' : 'Activar'}
+                        <div class="bg-[#0a0a0f] p-3 border-t border-[#1a1a2e] flex gap-2">
+                            <button onclick="toggleAgentStatus('${ag.id}', '${isAct ? 'paused' : 'active'}')" class="flex-1 py-1.5 rounded bg-[#111118] hover:bg-[#1a1a2e] text-xs text-gray-300 transition-colors">
+                                ${isAct ? '<i class="fas fa-pause mr-1"></i> Pausar' : '<i class="fas fa-play mr-1"></i> Activar'}
                             </button>
-                            <button onclick="deleteAgent('${ag.id}')" class="w-9 bg-red-900/20 text-red-500 hover:bg-red-900/40 rounded flex items-center justify-center transition-colors">
-                                <i class="fas fa-trash-alt text-xs"></i>
+                            <button onclick="deleteAgent('${ag.id}')" class="px-3 py-1.5 rounded bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs transition-colors">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </div>
+                    </div>
+                `;
+
+                // Card Mini (Dashboard)
+                if(isAct) {
+                    dashGrid.innerHTML += `
+                        <div class="glass-card p-4 flex items-center gap-3 border-l-2 ${col}-border">
+                            <div class="w-10 h-10 rounded-lg ${col}-bg bg-opacity-20 flex items-center justify-center text-xl border ${col}-border border-opacity-30">
+                                ${ag.icon || '🤖'}
+                            </div>
+                            <div>
+                                <div class="font-bold text-sm">${ag.name}</div>
+                                <div class="text-xs text-gray-400">${pr} tareas activas</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        async function toggleAgentStatus(id, newStatus) {
+            const data = await fetchAPI(`agents?id=eq.${id}`, 'PATCH', { status: newStatus });
+            if (data) {
+                showToast(`Agente ${newStatus === 'active' ? 'activado' : 'pausado'}`, 'success');
+                loadAgents();
+            }
+        }
+
+        async function deleteAgent(id) {
+            if(confirm('¿Eliminar este agente? Sus tareas quedarán sin asignar.')) {
+                await fetchAPI(`agents?id=eq.${id}`, 'DELETE');
+                showToast('Agente eliminado', 'info');
+                loadAgents();
+                loadTasks();
+            }
+        }
+
+        function updateTaskAgentSelect() {
+            const sel = document.getElementById('task-agent');
+            sel.innerHTML = '<option value="">Sin asignar (Manual)</option>';
+            agents.filter(a => a.status === 'active').forEach(a => {
+                sel.innerHTML += `<option value="${a.id}">${a.icon} ${a.name}</option>`;
+            });
+        }
+
+        // ==========================================
+        // 5. LÓGICA DE TAREAS (KANBAN)
+        // ==========================================
+        document.getElementById('form-task').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save-task');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            const agentId = document.getElementById('task-agent').value;
+
+            const payload = {
+                title: document.getElementById('task-title').value,
+                description: document.getElementById('task-desc').value,
+                status: 'pending',
+                priority: 'normal'
+            };
+
+            // SOLUCIÓN AL ERROR FAILED: Enviar null verdadero en lugar de ""
+            if (agentId && agentId !== "") {
+                payload.agent = agentId;
+            } else {
+                payload.agent = null; 
+            }
+
+            const data = await fetchAPI('tasks', 'POST', payload);
+            if (data && data.length > 0) {
+                showToast('Tarea creada con éxito', 'success');
+                closeModal('modal-task');
+                await loadTasks();
+            }
+            btn.disabled = false;
+            btn.innerHTML = 'Crear Tarea';
+        });
+
+        async function loadTasks() {
+            const data = await fetchAPI('tasks?order=created_at.desc');
+            if (data) {
+                tasks = data;
+                renderTasks();
+                renderAgents(); // para actualizar contadores
+            }
+        }
+
+        function renderTasks() {
+            const p = tasks.filter(t => t.status === 'pending');
+            const pr = tasks.filter(t => t.status === 'process');
+            const d = tasks.filter(t => t.status === 'done');
+
+            // Top Stats
+            document.getElementById('top-stat-pending').innerText = p.length;
+            document.getElementById('top-stat-process').innerText = pr.length;
+            document.getElementById('top-stat-done').innerText = d.length;
+            
+            // Dashboard Stats
+            document.getElementById('stat-pending').innerText = p.length;
+            document.getElementById('stat-process').innerText = pr.length;
+            document.getElementById('stat-done').innerText = d.length;
+
+            // Kanban Counts
+            document.getElementById('count-pending').innerText = p.length;
+            document.getElementById('count-process').innerText = pr.length;
+            document.getElementById('count-done').innerText = d.length;
+
+            // Render Columns
+            renderColumn('kb-pending', p);
+            renderColumn('kb-process', pr);
+            renderColumn('kb-done', d);
+        }
+
+        function renderColumn(colId, list) {
+            const col = document.getElementById(colId);
+            col.innerHTML = '';
+            
+            if(list.length === 0) {
+                col.innerHTML = `<div class="text-center p-4 text-gray-600 text-xs border border-dashed border-gray-800 rounded-lg">Sin tareas</div>`;
+                return;
+            }
+
+            list.forEach(t => {
+                const ag = agents.find(a => a.id === t.agent);
+                const agName = ag ? ag.name : 'Sin asignar';
+                const agIcon = ag ? ag.icon : '👤';
+                const colorCls = ag ? ag.color + '-text' : 'text-gray-400';
+                
+                let nextAction = '';
+                if(t.status === 'pending') nextAction = `<button onclick="updateTaskStatus('${t.id}', 'process')" class="text-blue-400 hover:text-blue-300"><i class="fas fa-arrow-right"></i></button>`;
+                if(t.status === 'process') nextAction = `<button onclick="updateTaskStatus('${t.id}', 'done')" class="text-green-400 hover:text-green-300"><i class="fas fa-check"></i></button>`;
+
+                col.innerHTML += `
+                    <div class="kanban-card bg-[#111118] border border-[#1a1a2e] p-3 rounded-lg cursor-grab hover:border-gray-600 transition-colors"
+                         draggable="true" ondragstart="drag(event, '${t.id}')">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="text-xs px-2 py-0.5 rounded bg-[#0a0a0f] border border-[#1a1a2e] flex items-center gap-1 ${colorCls}">
+                                ${agIcon} ${agName}
+                            </div>
+                            <div class="flex gap-2 text-gray-500">
+                                <button onclick="deleteTask('${t.id}')" class="hover:text-red-400"><i class="fas fa-trash text-xs"></i></button>
+                                ${nextAction}
+                            </div>
+                        </div>
+                        <div class="font-medium text-sm text-gray-200 mb-1">${t.title}</div>
+                        ${t.description ? `<div class="text-xs text-gray-500 line-clamp-2">${t.description}</div>` : ''}
                     </div>
                 `;
             });
         }
 
-        function renderKanban() {
-            ['pending', 'process', 'done'].forEach(status => {
-                const col = document.getElementById(`kanban-col-${status}`);
-                if(!col) return;
-                col.innerHTML = '';
-                
-                const colTasks = tasks.filter(t => t.status === status);
-                
-                if(colTasks.length === 0) {
-                    col.innerHTML = '<div class="text-sm text-gray-600 text-center py-6 border border-dashed border-gray-800 rounded-lg">Arrastra tareas aquí</div>';
-                    return;
-                }
-
-                colTasks.forEach(t => {
-                    const ag = agents.find(a => a.id === t.agent);
-                    const agTag = ag ? `<div class="mt-3 inline-block px-2 py-1 text-[10px] rounded ${ag.color}-tag font-medium"><i class="fas fa-robot mr-1"></i> ${ag.name}</div>` : '';
-                    
-                    let bColor = status === 'pending' ? 'border-l-orange-500' : (status === 'process' ? 'border-l-blue-500' : 'border-l-green-500');
-
-                    col.innerHTML += `
-                        <div id="task-${t.id}" class="task-card card p-4 border-l-4 ${bColor}" draggable="true" ondragstart="drag(event)" ondragend="this.style.opacity='1'">
-                            <div class="flex justify-between items-start mb-1">
-                                <h4 class="font-bold text-sm text-white leading-tight pr-4">${t.title}</h4>
-                                <button onclick="deleteTask('${t.id}')" class="text-gray-600 hover:text-red-500 transition-colors shrink-0"><i class="fas fa-times"></i></button>
-                            </div>
-                            ${t.description ? `<p class="text-xs text-gray-400 mt-1 line-clamp-2">${t.description}</p>` : ''}
-                            ${agTag}
-                        </div>
-                    `;
-                });
-            });
-            
-            // Re-bind drop events removal
-            document.querySelectorAll('.kanban-col').forEach(c => {
-                c.addEventListener('dragleave', (e) => e.currentTarget.classList.remove('drag-over'));
-            });
+        async function updateTaskStatus(id, newStatus) {
+            await fetchAPI(`tasks?id=eq.${id}`, 'PATCH', { status: newStatus });
+            loadTasks();
         }
+
+        async function deleteTask(id) {
+            if(confirm('¿Eliminar esta tarea permanentemente?')) {
+                await fetchAPI(`tasks?id=eq.${id}`, 'DELETE');
+                loadTasks();
+            }
+        }
+
+        // --- Drag and Drop Logic ---
+        function drag(ev, id) {
+            ev.dataTransfer.setData("text", id);
+            ev.target.classList.add('opacity-50');
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+            // visual feedback can be added here
+        }
+
+        async function drop(ev, newStatus) {
+            ev.preventDefault();
+            const id = ev.dataTransfer.getData("text");
+            if(id) {
+                // Optimistic UI update
+                const t = tasks.find(x => x.id === id);
+                if(t && t.status !== newStatus) {
+                    t.status = newStatus;
+                    renderTasks();
+                    // DB update
+                    await updateTaskStatus(id, newStatus);
+                }
+            }
+            document.querySelectorAll('.kanban-card').forEach(c => c.classList.remove('opacity-50'));
+        }
+
+        // ==========================================
+        // 6. INICIALIZACIÓN
+        // ==========================================
+        async function init() {
+            showToast('Conectando con Supabase...', 'info');
+            await loadAgents();
+            await loadTasks();
+            switchSection('dashboard');
+            
+            // Auto-refresh cada 30 segundos
+            setInterval(() => {
+                loadAgents();
+                loadTasks();
+            }, 30000);
+        }
+
+        // Start
+        window.onload = init;
 
     </script>
 </body>
